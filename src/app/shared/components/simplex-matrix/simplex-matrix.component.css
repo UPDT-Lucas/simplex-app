@@ -1,0 +1,33 @@
+* {
+  font-family: "Varela Round", sans-serif;
+  font-weight: 400;
+  font-style: normal
+}
+
+table {
+  border-collapse: collapse;
+  border: 1px solid #023463;
+}
+
+th {
+  background-color: #005cb3;
+  font-weight: 600;
+  color: white;
+}
+
+.indexes {
+  background-color: #023463;
+}
+
+.incoming {
+ background-color: #00b345;
+}
+
+.outgoing {
+  background-color: #b30000;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+}

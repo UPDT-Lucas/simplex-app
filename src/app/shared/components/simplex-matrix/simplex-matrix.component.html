@@ -1,0 +1,27 @@
+<table>
+  <tr>
+    <th class="indexes">i</th>
+    <th scope="col">BVS</th>
+    @for (horizontalHeader of headers[0]; track $index) {
+      @if (horizontalHeader == incoming) {
+        <th scope="col" class="incoming">{{horizontalHeader}}</th>
+      }@else{
+        <th scope="col">{{horizontalHeader}}</th>
+      }
+    }
+    <th>RHS</th>
+  </tr>
+  @for (verticalHeader of headers[1]; track $index) {
+    <tr>
+      <th scope="row" class="indexes">{{$index}}</th>
+      @if (verticalHeader == outgoing){
+        <th class="outgoing">{{verticalHeader}}</th>
+      }@else{
+        <th>{{verticalHeader}}</th>
+      }
+      @for (number of matrix[0]; track number; let idx = $index) {
+        <td>{{matrix[$index][idx]}}</td>
+      }
+    </tr>
+  }
+</table>
