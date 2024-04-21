@@ -1,0 +1,29 @@
+<div class="container">
+  <shared-header></shared-header>
+  <div class="main-content">
+
+    <div class="inputs">
+      <div class="obj">
+        <app-input label="x1"></app-input>
+        <app-input label="x2"></app-input>
+      </div>
+      <div class="grid-container"
+      [style.gridTemplateColumns]=gridColumnsStyle>
+      @for (eachR of iterableR; track $index) {
+        @for (eachC of iterableC; track $index) {
+          <app-input [label]="'x'+($index+1).toString()"></app-input>
+        }
+        <select id="eq">
+          <option value="value1"><=</option>
+          <option value="value2">>=</option>
+          <option value="value3">=</option>
+        </select>
+        <app-input label="rhs"></app-input>
+      }
+      </div>
+    </div>
+    <button type="text" routerLink="problem">
+      Siguiente
+    </button>
+  </div>
+</div>

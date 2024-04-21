@@ -1,0 +1,17 @@
+<div class="container">
+  <shared-header></shared-header>
+  <div class="main-content">
+    <div class="type">
+      <label for="obj">Problem type</label>
+      <select id="obj">
+        <option value="value1">max</option>
+        <option value="value2">min</option>
+      </select>
+    </div>
+    <app-input label="# variables"></app-input>
+    <app-input label="# restrictions"></app-input>
+    <button type="text" [routerLink]="['problem', '2', '2']">
+      Siguiente
+    </button>
+  </div>
+</div>
