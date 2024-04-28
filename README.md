@@ -1,5 +1,8 @@
 # SimplexApp
 
+This project is a webApp for solving different problems in the field of linear programming using the Simplex Algorithm 
+of George Bernard Dantzig
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.7.
 
 ## Development server
