@@ -2,11 +2,13 @@ export default class Simplex {
     private basicVars: string[];
     private currentVars: string[];
     private matrix: number[][];
+    private isMin: boolean;
 
-    constructor(matrix: number[][], basicVars: string[], currentVars: string[]) {
+    constructor(matrix: number[][], basicVars: string[], currentVars: string[], isMin: boolean) {
         this.matrix = matrix;
         this.basicVars = basicVars;
         this.currentVars = currentVars;
+        this.isMin = isMin;
     }
 
     public balanceArtificalVars() {
@@ -128,6 +130,24 @@ export default class Simplex {
             }
             console.log(row);
         }
+    }
+
+    public getSolution() {
+        let solution: { [key: string]: number } = {};
+        for (let i = 0; i < this.basicVars.length; i++) {
+            solution[this.basicVars[i]] = this.matrix[i][this.matrix[i].length - 1];
+        }
+        for (let i = 0; i < this.currentVars.length; i++) {
+            if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
+                solution[this.currentVars[i]] = 0;
+            }
+        }
+        let arraySolution = [];
+        for (let solutionKey in solution) {
+            arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
+        }
+        arraySolution.sort((a, b) => b.localeCompare(a));
+        return arraySolution;
     }
 
 }

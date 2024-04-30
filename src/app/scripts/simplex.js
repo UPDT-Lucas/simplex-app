@@ -1,10 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var Simplex = /** @class */ (function () {
-    function Simplex(matrix, basicVars, currentVars) {
+    function Simplex(matrix, basicVars, currentVars, isMin) {
         this.matrix = matrix;
         this.basicVars = basicVars;
         this.currentVars = currentVars;
+        this.isMin = isMin;
     }
     Simplex.prototype.balanceArtificalVars = function () {
         for (var i = 0; i < this.currentVars.length; i++) {
@@ -117,6 +118,23 @@ var Simplex = /** @class */ (function () {
             }
             console.log(row);
         }
+    };
+    Simplex.prototype.getSolution = function () {
+        var solution = {};
+        for (var i = 0; i < this.basicVars.length; i++) {
+            solution[this.basicVars[i]] = this.matrix[i][this.matrix[i].length - 1];
+        }
+        for (var i = 0; i < this.currentVars.length; i++) {
+            if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
+                solution[this.currentVars[i]] = 0;
+            }
+        }
+        var arraySolution = [];
+        for (var solutionKey in solution) {
+            arraySolution.push("".concat(solutionKey, " = ").concat(solution[solutionKey]));
+        }
+        arraySolution.sort(function (a, b) { return b.localeCompare(a); });
+        return arraySolution;
     };
     return Simplex;
 }());
