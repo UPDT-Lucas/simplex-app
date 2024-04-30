@@ -2,11 +2,61 @@
   <shared-header></shared-header>
   <div class="main-content">
 
-    <div class="inputs">
-      <div class="obj">
-        <app-input label="x1"></app-input>
-        <app-input label="x2"></app-input>
+    <div class="objective">
+      <h1>Objective Function</h1>
+      <div class="objective-grid">
+        @for (var of iterableV; track $index) {
+        <div class="flex-item">
+          <app-input [label]="'x'+($index+1)"></app-input>
+          <div class="operator">
+            @if ($index==(iterableV.length-1)) {
+            <p>=</p>
+            }@else{
+            <p>+</p>
+            }
+          </div>
+        </div>
+        }
+        <app-input label="rhs"></app-input>
       </div>
+    </div>
+
+
+    <div class="restrictions">
+      <h1>Restrictions</h1>
+      @for (rest of iterableR; track $index) {
+      <div class="restrictions-grid">
+
+        @for (var of iterableV; track $index) {
+        <div class="flex-item">
+          <app-input [label]="'x'+($index+1)"></app-input>
+          <div class="operator">
+            @if ($index==(iterableV.length-1)) {
+            <select id="eq">
+              <option value="value1">
+                <= </option>
+              <option value="value2"> >= </option>
+              <option value="value3"> = </option>
+            </select>
+            }@else{
+            <p>+</p>
+            }
+          </div>
+        </div>
+        }
+        <app-input label="rhs"></app-input>
+      </div>
+      }
+    </div>
+
+
+    <button type="text" routerLink="problem">
+      Solve
+    </button>
+  </div>
+</div>
+
+<!-- </div>
       <div class="grid-container"
       [style.gridTemplateColumns]=gridColumnsStyle>
       @for (eachR of iterableR; track $index) {
@@ -20,10 +70,4 @@
         </select>
         <app-input label="rhs"></app-input>
       }
-      </div>
-    </div>
-    <button type="text" routerLink="problem">
-      Siguiente
-    </button>
-  </div>
-</div>
+      </div> -->

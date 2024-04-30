@@ -20,7 +20,7 @@ export class ProblemSpecificationPageComponent {
   restrictions: number = 0
   elementsPerRow: number = 0
   iterableR: any[] = []
-  iterableC: any[] = []
+  iterableV: any[] = []
 
   constructor(private route: ActivatedRoute){}
 
@@ -29,12 +29,12 @@ export class ProblemSpecificationPageComponent {
       params => {
         this.variables = params["var"]
         this.restrictions = params["rest"]
+        console.log(this.variables)
+        console.log(this.restrictions)
       }
     )
     this.iterableR = Array(Number(this.restrictions)).fill(0)
-    this.iterableC = Array(Number(this.variables)).fill(0)
-    console.log(this.iterableR)
-    console.log(this.iterableC)
+    this.iterableV = Array(Number(this.variables)).fill(0)
     this.gridColumnsStyle = `repeat(${Number(this.variables)+2}, auto)`
   }
 }

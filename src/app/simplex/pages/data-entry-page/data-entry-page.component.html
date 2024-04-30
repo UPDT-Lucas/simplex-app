@@ -2,16 +2,28 @@
   <shared-header></shared-header>
   <div class="main-content">
     <div class="type">
-      <label for="obj">Problem type</label>
+      <label for="obj">Solving method</label>
       <select id="obj">
-        <option value="value1">max</option>
-        <option value="value2">min</option>
+        <option value="value1">Simplex</option>
+        <option value="value2">Great M</option>
       </select>
     </div>
-    <app-input label="# variables"></app-input>
-    <app-input label="# restrictions"></app-input>
-    <button type="text" [routerLink]="['problem', '2', '2']">
-      Siguiente
+    <div class="type">
+      <label for="obj">Problem type</label>
+      <select id="obj">
+        <option value="value1">Max</option>
+        <option value="value2">Min</option>
+      </select>
+    </div>
+    <app-input label="variables"
+      [(entry)]="varNumber">
+    </app-input>
+    <app-input label="restrictions"
+      [(entry)]="restNumber">
+    </app-input>
+    <button type="text"
+    (click)="goToDataEntry()">
+      Next
     </button>
   </div>
 </div>
