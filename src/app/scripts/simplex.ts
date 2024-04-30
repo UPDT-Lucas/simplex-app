@@ -144,7 +144,11 @@ export default class Simplex {
         }
         let arraySolution = [];
         for (let solutionKey in solution) {
-            arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
+            if(solutionKey.indexOf("z") !== -1 && this.isMin){
+                arraySolution.push(`${solutionKey} = ${-solution[solutionKey]}`);
+            } else {
+                arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
+            }
         }
         arraySolution.sort((a, b) => b.localeCompare(a));
         return arraySolution;

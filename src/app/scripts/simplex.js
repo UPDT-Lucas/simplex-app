@@ -131,7 +131,12 @@ var Simplex = /** @class */ (function () {
         }
         var arraySolution = [];
         for (var solutionKey in solution) {
-            arraySolution.push("".concat(solutionKey, " = ").concat(solution[solutionKey]));
+            if (solutionKey.indexOf("z") !== -1 && this.isMin) {
+                arraySolution.push("".concat(solutionKey, " = ").concat(-solution[solutionKey]));
+            }
+            else {
+                arraySolution.push("".concat(solutionKey, " = ").concat(solution[solutionKey]));
+            }
         }
         arraySolution.sort(function (a, b) { return b.localeCompare(a); });
         return arraySolution;

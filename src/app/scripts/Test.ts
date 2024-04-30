@@ -8,7 +8,7 @@ let matrix: number[][] = [
     [0, 1, 1, 0, 0, 0, 0, 5]
 ];
 
-const simplex = new Simplex(matrix, ["-w", "z", "a6", "a7", "s3"], ["x1", "x2", "s3", "s4", "s5", "a6", "a7"], false);
+const simplex = new Simplex(matrix, ["-w", "z", "a6", "a7", "s3"], ["x1", "x2", "s3", "s4", "s5", "a6", "a7"], true);
 
 simplex.getInfo();
 simplex.balanceArtificalVars();
@@ -24,8 +24,8 @@ simplex.getInfo();
 const solution = simplex.getSolution();
 console.log(solution);
 */
-
 import SimplexBigM from './simplex-big-m';
+
 type MatrixValue = string | number;
 type Matrix = MatrixValue[][];
 let matrix: Matrix = [
