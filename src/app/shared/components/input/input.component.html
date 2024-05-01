@@ -1,0 +1,16 @@
+<!-- <label for="number">{{label}}</label>
+<input type="number"
+       min="1"
+       id="number"> -->
+
+<div class="input-container">
+  <input
+    type="number"
+    min="1"
+    [ngModel]="entry"
+    (ngModelChange)="onInputChange($event)">
+  <hr>
+  <p>
+    {{label}}
+  </p>
+</div>

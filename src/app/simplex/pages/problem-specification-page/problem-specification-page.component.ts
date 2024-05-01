@@ -1,0 +1,75 @@
+import { CSP_NONCE, Component, Input } from '@angular/core';
+
+import { HeaderComponent } from '../../../shared/components/header/header.component';
+import { InputComponent } from '../../../shared/components/input/input.component';
+import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { SolverService } from '../../../solver.service';
+
+@Component({
+  selector: 'app-problem-specification-page',
+  standalone: true,
+  imports: [
+    HeaderComponent,
+    InputComponent,
+    FormsModule
+  ],
+  templateUrl: './problem-specification-page.component.html',
+  styleUrl: './problem-specification-page.component.css'
+})
+export class ProblemSpecificationPageComponent {
+
+  gridColumnsStyle: string = ""
+  variables: number = 0
+  restrictions: number = 0
+  elementsPerRow: number = 0
+  iterableR: any[] = []
+  iterableV: any[] = []
+  matrix: number[][] = []
+  rhs: number[] = []
+  operators: string[] = []
+  holder: string = ""
+  var: number = 0;
+  objectiveVariables: string[] = [];
+  restrictionVariables: string[][] = [];
+  rhsValue: string = "";
+
+  constructor(private route: ActivatedRoute, private solver: SolverService){}
+
+  ngOnInit(){
+    this.route.params.subscribe(
+      params => {
+        this.variables = params["var"]
+        this.restrictions = params["rest"]
+      }
+    )
+    this.iterableR = Array(Number(this.restrictions)).fill(0)
+    this.iterableV = Array(Number(this.variables)).fill(0)
+    this.operators = Array(Number(this.restrictions)).fill('<=')
+    this.gridColumnsStyle = `repeat(${Number(this.variables)+2}, auto)`
+
+    for (let i = 0; i < (+this.restrictions)+1 ; i++) {
+      this.matrix[i] = Array(2).fill(0);
+    }
+  }
+
+  getVariables(value: number, index1?: number, index2?: number) {
+    if (index1 !== undefined && index2 !== undefined) {
+      this.matrix[index1][index2] = value;
+    }
+  }
+
+  getRhs(value: number){
+    this.rhs.push(value)
+  }
+
+  OnSelectChange(event: any, index: number) {
+    if(event !== null){
+      this.operators[index] = event.target.value
+    }
+  }
+
+  solve(){
+    this.solver.solveSimplex(this.matrix, this.operators, this.rhs)
+  }
+}

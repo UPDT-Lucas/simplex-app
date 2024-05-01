@@ -1,12 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { SimplexMatrixComponent } from './shared/components/simplex-matrix/simplex-matrix.component';
+import { DataEntryPageComponent } from './simplex/pages/data-entry-page/data-entry-page.component';
+
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SimplexMatrixComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    DataEntryPageComponent
+    ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
