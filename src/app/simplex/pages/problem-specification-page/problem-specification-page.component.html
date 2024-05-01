@@ -7,7 +7,10 @@
       <div class="objective-grid">
         @for (var of iterableV; track $index) {
         <div class="flex-item">
-          <app-input [label]="'x'+($index+1)"></app-input>
+          <app-input
+            [label]="'x'+($index+1)"
+            (entryChange)="getVariables(+$event, 0, $index)">
+          </app-input>
           <div class="operator">
             @if ($index==(iterableV.length-1)) {
             <p>=</p>
@@ -17,7 +20,10 @@
           </div>
         </div>
         }
-        <app-input label="rhs"></app-input>
+        <app-input
+          label="rhs"
+          (entryChange)="getRhs(+$event)">
+        </app-input>
       </div>
     </div>
 
@@ -27,16 +33,19 @@
       @for (rest of iterableR; track $index) {
       <div class="restrictions-grid">
 
-        @for (var of iterableV; track $index) {
+        @for (var of iterableV; let idx = $index; track idx) {
         <div class="flex-item">
-          <app-input [label]="'x'+($index+1)"></app-input>
+          <app-input
+            [label]="'x'+($index+1)"
+            (entryChange)="getVariables(+$event, $index+1, idx)">
+          </app-input>
           <div class="operator">
-            @if ($index==(iterableV.length-1)) {
-            <select id="eq">
-              <option value="value1">
-                <= </option>
-              <option value="value2"> >= </option>
-              <option value="value3"> = </option>
+            @if (idx==(iterableV.length-1)) {
+            <select id="eq"
+            (change)="OnSelectChange($event, $index)">
+            <option value="<="> <= </option>
+              <option value=">="> >= </option>
+              <option value="="> = </option>
             </select>
             }@else{
             <p>+</p>
@@ -44,13 +53,18 @@
           </div>
         </div>
         }
-        <app-input label="rhs"></app-input>
+        <app-input
+          label="rhs"
+          (entryChange)="getRhs(+$event)">
+        </app-input>
       </div>
       }
     </div>
 
 
-    <button type="text" routerLink="problem">
+    <button
+      type="text"
+      (click)="solve()">
       Solve
     </button>
   </div>

@@ -4,11 +4,11 @@
        id="number"> -->
 
 <div class="input-container">
-<input type="number"
-min="1"
-[ngModel]="entry"
-(ngModelChange)="entryChange.emit($event)"
-required>
+  <input
+    type="number"
+    min="1"
+    [ngModel]="entry"
+    (ngModelChange)="onInputChange($event)">
   <hr>
   <p>
     {{label}}

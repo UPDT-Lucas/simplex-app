@@ -22,7 +22,7 @@ export class DataEntryPageComponent {
 
   constructor(private router: Router) {}
 
-  goToDataEntry(){
+  goToSpecification(){
     if( ((+this.varNumber) > 0) && ((+this.restNumber) > 0)){
       this.router.navigate(["problem", this.varNumber, this.restNumber])
     }
