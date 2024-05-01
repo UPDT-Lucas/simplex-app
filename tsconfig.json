@@ -21,8 +21,7 @@
     "useDefineForClassFields": false,
     "lib": [
       "ES2022",
-      "dom",
-      "ES2022.object"
+      "dom"
     ]
   },
   "angularCompilerOptions": {

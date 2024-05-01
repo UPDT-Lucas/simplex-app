@@ -73,8 +73,9 @@ export default class Simplex {
 
     }
 
+    //Add way to recognize when the rhs is negative and there is no more currentVars to pivot
     public makeFaseTwoIteration() {
-        for(let i = 0; i < this.matrix[0].length; i++) {
+        for(let i = 0; i < this.matrix[0].length-1; i++) {
             if(this.matrix[0][i] < 0) {
                 let min = Number.MAX_VALUE;
                 let row = -1;
