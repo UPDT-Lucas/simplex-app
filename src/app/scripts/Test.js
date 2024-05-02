@@ -1,7 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Algebrite = require('algebrite');
-var Math = require('mathjs');
 /*
 import Simplex from './simplex';
 let matrix: number[][] = [
@@ -40,7 +38,10 @@ simplexBigM.balanceArtificalVars();
 simplexBigM.getInfo();
 console.log('-----------------------------------------------------');
 simplexBigM.makeIteration();
+console.log(simplexBigM.checkSolved());
 simplexBigM.getInfo();
 console.log('-----------------------------------------------------');
 simplexBigM.makeIteration();
 simplexBigM.getInfo();
+console.log(simplexBigM.checkSolved());
+console.log(simplexBigM.getSolution());

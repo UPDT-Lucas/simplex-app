@@ -74,6 +74,21 @@ var SimplexBigM = /** @class */ (function () {
             }
         }
     };
+    SimplexBigM.prototype.checkSolved = function () {
+        for (var i = 0; i < this.matrix[0].length - 1; i++) {
+            var currentCoeff = void 0;
+            if (Number.isNaN(Number(this.matrix[0][i]))) {
+                currentCoeff = Algebrite.coeff(this.matrix[0][i], 'M', 1).toString();
+            }
+            else {
+                currentCoeff = this.matrix[0][i];
+            }
+            if (currentCoeff < 0) {
+                return false;
+            }
+        }
+        return true;
+    };
     SimplexBigM.prototype.multiplyRow = function (row, value) {
         for (var i = 0; i < this.matrix[row].length; i++) {
             if (typeof this.matrix[row][i] === 'number' && typeof value === 'number') {
@@ -105,6 +120,28 @@ var SimplexBigM = /** @class */ (function () {
                 continue;
             }
         }
+    };
+    SimplexBigM.prototype.getSolution = function () {
+        var solution = {};
+        for (var i = 0; i < this.basicVars.length; i++) {
+            solution[this.basicVars[i]] = Number(this.matrix[i][this.matrix[i].length - 1]);
+        }
+        for (var i = 0; i < this.currentVars.length; i++) {
+            if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
+                solution[this.currentVars[i]] = 0;
+            }
+        }
+        var arraySolution = [];
+        for (var solutionKey in solution) {
+            if (solutionKey.indexOf("z") !== -1 && this.isMin) {
+                arraySolution.push("".concat(solutionKey, " = ").concat(-solution[solutionKey]));
+            }
+            else {
+                arraySolution.push("".concat(solutionKey, " = ").concat(solution[solutionKey]));
+            }
+        }
+        arraySolution.sort(function (a, b) { return b.localeCompare(a); });
+        return arraySolution;
     };
     SimplexBigM.prototype.getInfo = function () {
         console.log(this.currentVars);

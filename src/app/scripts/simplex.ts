@@ -59,6 +59,15 @@ export default class Simplex {
         }
     }
 
+    public checkSolved() {
+        for (let i = 0; i < this.matrix[0].length - 2; i++) {
+            if(this.matrix[0][i] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public prepareFaseTwo() {
         this.basicVars.splice(0, 1);
         this.matrix.splice(0, 1);

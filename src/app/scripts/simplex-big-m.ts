@@ -83,6 +83,21 @@ export default class SimplexBigM {
         }       
     }
 
+    public checkSolved() {
+        for (let i = 0; i < this.matrix[0].length - 2; i++) {
+            let currentCoeff;
+            if(Number.isNaN(Number(this.matrix[0][i]))){
+                currentCoeff = Algebrite.coeff(this.matrix[0][i], 'M', 1).toString();
+            } else {
+                currentCoeff = this.matrix[0][i];
+            }
+            if (currentCoeff < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public multiplyRow(row: number, value: number | string) {
         for (let i = 0; i < this.matrix[row].length; i++) {
             if(typeof this.matrix[row][i] === 'number' && typeof value === 'number') {
@@ -113,6 +128,28 @@ export default class SimplexBigM {
                 continue;
             }
         }
+    }
+
+    public getSolution() {
+        let solution: { [key: string]: number } = {};
+        for (let i = 0; i < this.basicVars.length; i++) {
+            solution[this.basicVars[i]] = Number(this.matrix[i][this.matrix[i].length - 1]);
+        }
+        for (let i = 0; i < this.currentVars.length; i++) {
+            if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
+                solution[this.currentVars[i]] = 0;
+            }
+        }
+        let arraySolution = [];
+        for (let solutionKey in solution) {
+            if(solutionKey.indexOf("z") !== -1 && this.isMin){
+                arraySolution.push(`${solutionKey} = ${-solution[solutionKey]}`);
+            } else {
+                arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
+            }
+        }
+        arraySolution.sort((a, b) => b.localeCompare(a));
+        return arraySolution;
     }
 
     
