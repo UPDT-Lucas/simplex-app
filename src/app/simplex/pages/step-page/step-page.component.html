@@ -1,0 +1,13 @@
+<div class="container">
+  <shared-header></shared-header>
+  <div class="main-content">
+    <shared-simplex-matrix
+    [matrix]="this.matrix"
+    [verticalHeaders]="this.verticalHeaders"
+    [horizontalHeaders]="this.horizontalHeaders">
+  </shared-simplex-matrix>
+  <button (click)="solve()">
+    Solve
+  </button>
+  </div>
+</div>

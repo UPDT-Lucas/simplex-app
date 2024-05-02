@@ -1,8 +1,7 @@
-import { CSP_NONCE, Component, Input } from '@angular/core';
-
+import { Component } from '@angular/core';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SolverService } from '../../../solver.service';
 
@@ -33,16 +32,22 @@ export class ProblemSpecificationPageComponent {
   objectiveVariables: string[] = [];
   restrictionVariables: string[][] = [];
   rhsValue: string = "";
+  type: string = ""
+  method: string = ""
 
-  constructor(private route: ActivatedRoute, private solver: SolverService){}
+
+  constructor(private route: ActivatedRoute, private solver: SolverService, private router: Router){}
 
   ngOnInit(){
     this.route.params.subscribe(
       params => {
         this.variables = params["var"]
         this.restrictions = params["rest"]
+        this.type = params["type"] == 0 ? "max" : "min"
+        this.method = params["method"] == 0 ? "simplex" : "M"
       }
     )
+    this.rhs = Array(Number(this.restrictions+1)).fill(0)
     this.iterableR = Array(Number(this.restrictions)).fill(0)
     this.iterableV = Array(Number(this.variables)).fill(0)
     this.operators = Array(Number(this.restrictions)).fill('<=')
@@ -59,8 +64,8 @@ export class ProblemSpecificationPageComponent {
     }
   }
 
-  getRhs(value: number){
-    this.rhs.push(value)
+  getRhs(value: number, index: number){
+    this.rhs[index] = value
   }
 
   OnSelectChange(event: any, index: number) {
@@ -70,6 +75,12 @@ export class ProblemSpecificationPageComponent {
   }
 
   solve(){
-    this.solver.solveSimplex(this.matrix, this.operators, this.rhs)
+    const allObj = this.matrix[0].every(value => value != 0)
+    const areRhs = this.rhs.some(value => value !== 0);
+    const areValues = this.matrix.some(row => row.some(value => value !== 0));
+    if(areRhs && areValues && allObj){
+      this.solver.solveSimplex(this.matrix, this.operators, this.rhs, this.type, this.method)
+      this.router.navigate(["solve"])
+    }
   }
 }

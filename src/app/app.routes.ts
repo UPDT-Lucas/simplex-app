@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { DataEntryPageComponent } from './simplex/pages/data-entry-page/data-entry-page.component';
 import { ProblemSpecificationPageComponent } from './simplex/pages/problem-specification-page/problem-specification-page.component';
+import { StepPageComponent } from './simplex/pages/step-page/step-page.component';
 
 export const routes: Routes = [
   {
@@ -8,7 +9,11 @@ export const routes: Routes = [
     component: DataEntryPageComponent
   },
   {
-    path: 'problem/:var/:rest',
+    path: 'problem/:method/:type/:var/:rest',
     component: ProblemSpecificationPageComponent
+  },
+  {
+    path: 'solve',
+    component: StepPageComponent
   }
 ];

@@ -12,7 +12,10 @@ export class SimplexMatrixComponent {
   matrix: number [][] = [];
 
   @Input()
-  headers: string [][] = [];
+  horizontalHeaders: string[] = [];
+
+  @Input()
+  verticalHeaders: string[] = [];
 
   @Input()
   incoming: string = ""

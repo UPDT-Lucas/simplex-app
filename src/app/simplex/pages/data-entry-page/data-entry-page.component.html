@@ -3,16 +3,18 @@
   <div class="main-content">
     <div class="type">
       <label for="obj">Solving method</label>
-      <select id="obj">
-        <option value="value1">Simplex</option>
-        <option value="value2">Great M</option>
+      <select id="obj"
+      (change)="OnMethodChange($event)">
+        <option value="0">Simplex</option>
+        <option value="1">Big M</option>
       </select>
     </div>
     <div class="type">
       <label for="obj">Problem type</label>
-      <select id="obj">
-        <option value="value1">Max</option>
-        <option value="value2">Min</option>
+      <select id="obj"
+      (change)="OnTypeChange($event)">
+        <option value="0">Max</option>
+        <option value="1">Min</option>
       </select>
     </div>
     <app-input label="variables"

@@ -19,12 +19,27 @@ export class DataEntryPageComponent {
 
   varNumber: string = "";
   restNumber: string = "";
+  method: number = 0;
+  type: number = 0;
+
 
   constructor(private router: Router) {}
 
   goToSpecification(){
     if( ((+this.varNumber) > 0) && ((+this.restNumber) > 0)){
-      this.router.navigate(["problem", this.varNumber, this.restNumber])
+      this.router.navigate(["problem", this.method, this.type, this.varNumber, this.restNumber])
+    }
+  }
+
+  OnTypeChange(event: any) {
+    if(event !== null){
+      this.type = event.target.value
+    }
+  }
+
+  OnMethodChange(event: any) {
+    if(event !== null){
+      this.method = event.target.value
     }
   }
 }
