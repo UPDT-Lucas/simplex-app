@@ -1,26 +1,26 @@
-<table>
+<table [style.border]="borderColor">
   <tr>
-    <th class="indexes">i</th>
-    <th scope="col">BVS</th>
+    <th class="indexes" [style.backgroundColor]="indexesBackgroundColor">i</th>
+    <th scope="col" [style.backgroundColor]="backgroundColor">BVS</th>
     @if(horizontalHeaders){
       @for (hHeader of horizontalHeaders; track $index) {
         @if (hHeader == incoming) {
-          <th scope="col" class="incoming">{{hHeader}}</th>
+          <th  scope="col"[style.backgroundColor]="backgroundColor">{{hHeader}}</th>
         }@else{
-          <th scope="col">{{hHeader}}</th>
+          <th scope="col" [style.backgroundColor]="backgroundColor">{{hHeader}}</th>
         }
       }
     }
-    <th>RHS</th>
+    <th [style.backgroundColor]="backgroundColor">RHS</th>
   </tr>
   @if(verticalHeaders){
     @for (vHeader of verticalHeaders; track $index) {
       <tr>
-        <th scope="row" class="indexes">{{$index}}</th>
+        <th scope="row" [style.backgroundColor]="indexesBackgroundColor">{{$index}}</th>
         @if (vHeader == outgoing){
-          <th class="outgoing">{{vHeader}}</th>
+          <th [style.backgroundColor]="backgroundColor">{{vHeader}}</th>
         }@else{
-          <th>{{vHeader}}</th>
+          <th [style.backgroundColor]="backgroundColor">{{vHeader}}</th>
         }
         @for (number of matrix[0]; track number; let idx = $index) {
           <td>{{matrix[$index][idx]}}</td>
@@ -29,3 +29,4 @@
     }
   }
 </table>
+

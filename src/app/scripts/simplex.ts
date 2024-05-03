@@ -3,6 +3,7 @@ export default class Simplex {
   private currentVars: string[];
   private matrix: number[][];
   private isMin: boolean;
+  private solutions: string[] = [];
 
   constructor(matrix: number[][], basicVars: string[], currentVars: string[], isMin: boolean) {
       this.matrix = matrix;
@@ -48,12 +49,14 @@ export default class Simplex {
                       }
                   }
               }
+              this.currentVars[row] = this.basicVars[i]
               if(row === -1) {
                   return -1;
               }
               this.multiplyRow(row, 1 / this.matrix[row][i]);
               this.gaussJordan(row, i);
               this.basicVars[row] = this.currentVars[i];
+              // this.currentVars[row] = this.basicVars[i]
           }
       }
       return 1
@@ -95,19 +98,15 @@ export default class Simplex {
                           row = j;
                       }
                   }
-              }
+                }
+                this.currentVars[row] = this.basicVars[i]
               if(row === -1) {
                   return -1;
               }
               this.multiplyRow(row, 1 / this.matrix[row][i]);
               this.gaussJordan(row, i);
-              console.log(this.basicVars)
-              console.log(this.currentVars)
-              console.log(i)
-              console.log(row)
               this.basicVars[row] = this.currentVars[i];
-              console.log(this.basicVars)
-              console.log(this.currentVars)
+              // this.currentVars[row] = this.basicVars[i]
           }
       }
       return 1;
@@ -140,6 +139,10 @@ export default class Simplex {
     return this.basicVars
   }
 
+  public getCurrentVars(){
+    return this.currentVars
+  }
+
   public getInfo() {
       console.log(this.currentVars);
       for (let i = 0; i < this.matrix.length; i++) {
@@ -151,26 +154,41 @@ export default class Simplex {
       }
   }
 
-  public getSolution() {
-      let solution: { [key: string]: number } = {};
-      for (let i = 0; i < this.basicVars.length; i++) {
-          solution[this.basicVars[i]] = this.matrix[i][this.matrix[i].length - 1];
+  public getSolution(): string[] {
+      // let solution: { [key: string]: number } = {};
+      // console.log("basic")
+      // console.log(this.basicVars)
+      // for (let i = 0; i < this.basicVars.length; i++) {
+      //   console.log(this.basicVars[i])
+      //   solution[this.basicVars[i]] = this.matrix[i][this.matrix[i].length - 1];
+      // }
+      // for (let i = 0; i < this.currentVars.length; i++) {
+      //     if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
+      //         solution[this.currentVars[i]] = 0;
+      //     }
+      // }
+      // let arraySolution = [];
+      // for (let solutionKey in solution) {
+      //     if(solutionKey.indexOf("z") !== -1 && this.isMin){
+      //         arraySolution.push(`${solutionKey} = ${-solution[solutionKey]}`);
+      //     } else {
+      //         arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
+      //     }
+      // }
+      // arraySolution.sort((a, b) => b.localeCompare(a));
+      // return arraySolution;
+      this.matrix = this.transpose(this.matrix)
+      const rhs = this.matrix[this.matrix.length-1]
+      for(let i = 0; i < this.currentVars.length; i++){
+        this.solutions.push(`${this.currentVars[i]} = ${rhs[i]}`)
       }
-      for (let i = 0; i < this.currentVars.length; i++) {
-          if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
-              solution[this.currentVars[i]] = 0;
-          }
-      }
-      let arraySolution = [];
-      for (let solutionKey in solution) {
-          if(solutionKey.indexOf("z") !== -1 && this.isMin){
-              arraySolution.push(`${solutionKey} = ${-solution[solutionKey]}`);
-          } else {
-              arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
-          }
-      }
-      arraySolution.sort((a, b) => b.localeCompare(a));
-      return arraySolution;
+      this.matrix = this.transpose(this.matrix)
+      return this.solutions
   }
+
+  transpose(matrix: number[][]): number[][] {
+    return matrix[0].map((_, i) => matrix.map(array => array[i]));
+  }
+
 
 }

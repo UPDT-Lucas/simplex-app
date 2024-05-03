@@ -22,6 +22,9 @@ export class StepPageComponent {
   type: string = "";
   method: string = "";
   maxIterations: number = 10;
+  noSolution: boolean = false;
+  solved: boolean = false;
+  solutions: string [] = []
 
   constructor(private solverService: SolverService) { }
 
@@ -56,38 +59,39 @@ export class StepPageComponent {
   solve() {
     if (this.method == "simplex") {
       const Solver = new Simplex([... this.matrix], [... this.horizontalHeaders], [... this.verticalHeaders], this.type == "max" ? false : true)
-      // const Solver = new Simplex(this.matrix, this.horizontalHeaders, this.verticalHeaders, this.type == "max" ? false : true)
 
       if(this.verticalHeaders.includes("w")){
         Solver.balanceArtificalVars()
         while (!Solver.checkSolved()) {
           if (Solver.makeFaseOneIteration() == -1) {
-            console.log("no solucion")
+            this.noSolution = true;
             return
           }
-          Solver.getInfo()
         }
         Solver.prepareFaseTwo()
       }
-      console.log("pasa por aqui")
 
       while (!Solver.checkSolved()) {
         if (Solver.makeFaseTwoIteration() == -1) {
-          console.log("no solucion")
+          this.noSolution = true;
           return
         }
         Solver.getInfo()
       }
-      console.log("text")
-      console.log(this.verticalHeaders)
-      this.verticalHeaders = Solver.getBasicVars();
-      console.log(this.verticalHeaders)
+      this.solved = true;
+      this.verticalHeaders = Solver.getCurrentVars();
+      this.solutions = Solver.getSolution()
+      console.log(this.solutions)
     } else {
-      const Solver = new SimplexBigM(this.matrix, this.horizontalHeaders, this.verticalHeaders, this.type == "max" ? false : true)
+      const Solver = new SimplexBigM([... this.matrix], [... this.horizontalHeaders], [... this.verticalHeaders], this.type == "max" ? false : true)
       Solver.balanceArtificalVars()
       while (!Solver.checkSolved()) {
-        Solver.makeIteration()
+        if(Solver.makeIteration() == -1){
+          this.noSolution = true;
+          return
+        }
       }
+      this.solved = true;
     }
 
   }

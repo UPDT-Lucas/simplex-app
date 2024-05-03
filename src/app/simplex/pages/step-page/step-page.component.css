@@ -24,3 +24,10 @@ button {
   box-sizing: border-box;
 }
 
+.solutions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  max-width: 50%;
+}
+

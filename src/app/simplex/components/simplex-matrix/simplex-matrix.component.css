@@ -14,8 +14,8 @@ th {
   color: white;
 }
 
-.indexes {
-  background-color: #023463;
+.error {
+  border: 1px solid #630202;
 }
 
 .incoming {

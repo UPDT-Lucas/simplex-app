@@ -76,7 +76,7 @@ export class ProblemSpecificationPageComponent {
   }
 
   solve(){
-    const allObj = this.matrix[0].every(value => value !== 0)
+    const allObj = this.matrix[0].some(value => value !== 0)
     const areRhs = this.rhs.some(value => value !== 0);
     const areValues = this.matrix.some(row => row.some(value => value !== 0));
     if(areRhs && areValues && allObj){

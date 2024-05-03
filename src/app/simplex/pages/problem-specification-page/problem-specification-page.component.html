@@ -32,7 +32,7 @@
           @for (var of iterableV; let idx = $index; track idx) {
             <div class="flex-item">
               <app-input
-                [label]="'x'+($index+1)"
+                [label]="'x'+(idx+1)"
                 (entryChange)="getVariables(+$event, $index+1, idx)">
               </app-input>
               <div class="operator">

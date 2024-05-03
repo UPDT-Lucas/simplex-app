@@ -107,7 +107,7 @@ export class SolverService {
     this.checkType()
     this.getNormalVariables(matrix[0])
     this.getCurrentVariables(operators)
-    if(this.type == "simplex"){
+    if(this.method == "simplex"){
       this.setMinW()
     }else{
       this.addM()
