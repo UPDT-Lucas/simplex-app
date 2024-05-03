@@ -4,7 +4,6 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 
-// type matrixValue = string | number
 export class SolverService {
 
   private matrix: any[][] = [];
@@ -21,17 +20,34 @@ export class SolverService {
 
   getVerticalHeaders(): string []{
     const matrixVerticalHeaders = localStorage.getItem('v-headers');
-    return matrixVerticalHeaders ? JSON.parse(matrixVerticalHeaders) : [];
+    this.BvsHeaders = matrixVerticalHeaders ? JSON.parse(matrixVerticalHeaders) : [];
+    return this.BvsHeaders
   }
 
   getHorizontalHeaders(): string []{
     const matrixHorizontalHeaders = localStorage.getItem('h-headers');
-    return matrixHorizontalHeaders ? JSON.parse(matrixHorizontalHeaders) : [];
+    this.varHeaders =  matrixHorizontalHeaders ? JSON.parse(matrixHorizontalHeaders) : [];
+    return this.varHeaders
+  }
+
+  getType(): string {
+    return this.type
+  }
+
+  getMethod(): string {
+    return this.method
+  }
+
+  clearStorage(){
+    localStorage.clear();
+    this.BvsHeaders = ["z"]
+    this.varHeaders = []
   }
 
   getMatrix(): number[][]{
     const matrixString = localStorage.getItem('matrix');
-    return matrixString ? JSON.parse(matrixString) : [];
+    this.matrix =  matrixString ? JSON.parse(matrixString) : [];
+    return this.matrix
   }
 
   getCurrentVariables(operators: string[]) {
@@ -101,8 +117,6 @@ export class SolverService {
   }
 
   checkType(){
-    console.log("tt")
-    console.log(this.type)
     if(this.type=="max"){
       this.matrix[0].forEach(
         (el, index) => {
@@ -175,10 +189,6 @@ export class SolverService {
     let newColumn: number[] = Array(Number(length + 1)).fill(0)
     newColumn[index] = 1
     this.addColumn(newColumn)
-  }
-
-  solve(){
-
   }
 
 }

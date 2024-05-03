@@ -2,26 +2,30 @@
   <tr>
     <th class="indexes">i</th>
     <th scope="col">BVS</th>
-    @for (hHeader of horizontalHeaders; track $index) {
-      @if (hHeader == incoming) {
-        <th scope="col" class="incoming">{{hHeader}}</th>
-      }@else{
-        <th scope="col">{{hHeader}}</th>
+    @if(horizontalHeaders){
+      @for (hHeader of horizontalHeaders; track $index) {
+        @if (hHeader == incoming) {
+          <th scope="col" class="incoming">{{hHeader}}</th>
+        }@else{
+          <th scope="col">{{hHeader}}</th>
+        }
       }
     }
     <th>RHS</th>
   </tr>
-  @for (vHeader of verticalHeaders; track $index) {
-    <tr>
-      <th scope="row" class="indexes">{{$index}}</th>
-      @if (vHeader == outgoing){
-        <th class="outgoing">{{vHeader}}</th>
-      }@else{
-        <th>{{vHeader}}</th>
-      }
-      @for (number of matrix[0]; track number; let idx = $index) {
-        <td>{{matrix[$index][idx]}}</td>
-      }
-    </tr>
+  @if(verticalHeaders){
+    @for (vHeader of verticalHeaders; track $index) {
+      <tr>
+        <th scope="row" class="indexes">{{$index}}</th>
+        @if (vHeader == outgoing){
+          <th class="outgoing">{{vHeader}}</th>
+        }@else{
+          <th>{{vHeader}}</th>
+        }
+        @for (number of matrix[0]; track number; let idx = $index) {
+          <td>{{matrix[$index][idx]}}</td>
+        }
+      </tr>
+    }
   }
 </table>

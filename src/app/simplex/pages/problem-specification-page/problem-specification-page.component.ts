@@ -56,6 +56,7 @@ export class ProblemSpecificationPageComponent {
     for (let i = 0; i < (+this.restrictions)+1 ; i++) {
       this.matrix[i] = Array(2).fill(0);
     }
+    this.solver.clearStorage()
   }
 
   getVariables(value: number, index1?: number, index2?: number) {
@@ -75,7 +76,7 @@ export class ProblemSpecificationPageComponent {
   }
 
   solve(){
-    const allObj = this.matrix[0].every(value => value != 0)
+    const allObj = this.matrix[0].every(value => value !== 0)
     const areRhs = this.rhs.some(value => value !== 0);
     const areValues = this.matrix.some(row => row.some(value => value !== 0));
     if(areRhs && areValues && allObj){
