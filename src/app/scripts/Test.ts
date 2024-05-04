@@ -3,25 +3,35 @@ import SimplexBigM from './simplex-big-m';
 type MatrixValue = string | number;
 type Matrix = MatrixValue[][];
 let matrix: Matrix = [
-    [-2, 1, 0, 0, 'M', 0],
-    [1, 1, 1, 0, 0, 3],
-    [-1, 1, 0, -1, 1, 1]
+  [-5, 2, -1, 1, 0, 0, 'M', 0],
+  [1, 4, 1, -1, 1, 0, 0, 6],
+  [2, 1, 3, -3, 0, -1, 1, 2],
 ];
 
-const simplexBigM = new SimplexBigM(matrix, ["z", "s3", "a5"], ["x1", "x2", "s3", "s4","a5"], false);
+const simplexBigM = new SimplexBigM(
+  matrix,
+  ['z', 's4', 'a6'],
+  ['x1', 'x2', 'x3p', 'x3pp', 's4', 's5', 'a6'],
+  false
+);
 
-simplexBigM.getInfo();
 simplexBigM.balanceArtificalVars();
 simplexBigM.getInfo();
-console.log('-----------------------------------------------------')
-simplexBigM.makeIteration();
-console.log(simplexBigM.checkSolved());
+let i = 0;
+while (!simplexBigM.checkSolved()) {
+  console.log('Iteration: ', i++);
+  simplexBigM.getInfo();
+  if (simplexBigM.makeIteration() == -1) {
+    console.log('No solution');
+    break;
+  }
+  console.log('SOLVED?: ---------------------------------------------- ' + simplexBigM.checkSolved());
+  if(i > 3){
+    break
+  }
+}
+
 simplexBigM.getInfo();
-console.log('-----------------------------------------------------')
-simplexBigM.makeIteration();
-simplexBigM.getInfo();
-console.log(simplexBigM.checkSolved());
-console.log(simplexBigM.getSolution());
 /*
 import Simplex from './simplex';
 let matrix: number[][] = [

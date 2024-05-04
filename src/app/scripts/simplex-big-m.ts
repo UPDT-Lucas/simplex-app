@@ -65,23 +65,58 @@ export default class SimplexBigM {
 
 
   public makeIteration() {
+    let minCoeff = Number.MAX_VALUE;
+    for (let i = 0; i < this.matrix[0].length - 1; i++) {
+      let actualCoeff;
+      if (this.matrix[0][i].toString().includes('M')) {
+        console.log('BEFORE ERROR ', this.matrix[0][i].toString())
+        console.log('VEFORE ERROR ', Math.simplify(this.matrix[0][i].toString()).toString())
+        actualCoeff = parseFloat(Algebrite.coeff(this.matrix[0][i], 'M', 1).toString());
+        if (actualCoeff < minCoeff) {
+          minCoeff = actualCoeff;
+        }
+      } else {
+        if(typeof this.matrix[0][i] === 'string') {
+          actualCoeff = Math.evaluate(this.matrix[0][i].toString());
+          if (actualCoeff < minCoeff) {
+            minCoeff = actualCoeff;
+          }
+        } else {
+          actualCoeff = this.matrix[0][i];
+          if (Number(actualCoeff) < minCoeff) {
+            minCoeff = Number(actualCoeff);
+          }
+        }
+      }   
+    }
+    console.log("MINCOEFF ", minCoeff)
+    if (minCoeff >= 0) {
+      return -1;
+    }
     for (let i = 0; i < this.matrix[0].length - 1; i++) {
       let currentCoeff;
-      if (Number.isNaN(Number(this.matrix[0][i]))) {
-        currentCoeff = Algebrite.coeff(this.matrix[0][i], 'M', 1).toString();
+      if (this.matrix[0][i].toString().includes('M')) {
+        currentCoeff = parseFloat(Algebrite.coeff(this.matrix[0][i], 'M', 1).toString());
       } else {
-        currentCoeff = this.matrix[0][i];
+        currentCoeff = Math.evaluate(this.matrix[0][i].toString())
       }
-      if (currentCoeff < 0) {
+      console.log('currentCoeff ', currentCoeff, 'minCoeff ', minCoeff, 'compare ', currentCoeff == minCoeff)
+      if (currentCoeff < 0 && currentCoeff == minCoeff) {
         let min = Number.MAX_VALUE;
         let row = -1;
         for (let j = 1; j < this.matrix.length; j++) {
           if (Number(this.matrix[j][i]) > 0) {
-            let ratio = Number(this.matrix[j][this.matrix[j].length - 1]) / Number(this.matrix[j][i]);
+            console.log('ratio params ', this.matrix[j][this.matrix[j].length - 1], this.matrix[j][i])
+            console.log('Fixed params ', Math.evaluate(`(${this.matrix[j][this.matrix[j].length - 1]}) / (${this.matrix[j][i]})`))
+            let ratio = Math.evaluate(`(${this.matrix[j][this.matrix[j].length - 1]}) / (${this.matrix[j][i]})`);
+            if (ratio < 0) {
+              ratio = Number.MAX_VALUE;
+            }
             if (ratio < min) {
               min = ratio;
               row = j;
             }
+            console.log('ratio ', ratio, 'min ', min, 'row ', row, 'column ', i)
           }
         }
         if (row === -1) {
@@ -90,20 +125,21 @@ export default class SimplexBigM {
         this.multiplyRow(row, 1 / Number(this.matrix[row][i]));
         this.gaussJordan(row, i);
         this.basicVars[row] = this.currentVars[i];
+        break;
       }
     }
     return 1
   }
 
   public checkSolved() {
-    for (let i = 0; i < this.matrix[0].length - 2; i++) {
+    for (let i = 0; i < this.matrix[0].length - 1; i++) {
       let currentCoeff;
-      if (Number.isNaN(Number(this.matrix[0][i]))) {
-        currentCoeff = Algebrite.coeff(this.matrix[0][i], 'M', 1).toString();
+      if (this.matrix[0][i].toString().includes('M')) {
+        currentCoeff = Algebrite.coeff(Math.rationalize(this.matrix[0][i].toString()).toString(), 'M', 1).toString();
       } else {
         currentCoeff = this.matrix[0][i];
       }
-      if (currentCoeff < 0) {
+      if (parseFloat(currentCoeff) < 0) {
         return false;
       }
     }
@@ -115,7 +151,7 @@ export default class SimplexBigM {
       if (typeof this.matrix[row][i] === 'number' && typeof value === 'number') {
         this.matrix[row][i] = Number(this.matrix[row][i]) * value;
       } else {
-        this.matrix[row][i] = Algebrite.run(this.matrix[row][i] + "*" + value);
+        this.matrix[row][i] = Math.simplify(this.matrix[row][i] + "*" + value).toString();
       }
     }
   }
@@ -126,10 +162,31 @@ export default class SimplexBigM {
         continue;
       }
       let factor;
-      if (typeof this.matrix[i][column] == "string") {
-        factor = Algebrite.run(`-(${this.matrix[i][column]}) / ${this.matrix[row][column]}`).toString();
+      if (typeof this.matrix[i][column] == "string" || true) {
+        let factorToAssign = this.matrix[i][column].toString();
+        if(factorToAssign.includes('M')) {
+          factor = Math.simplify( Math.rationalize(`-(${this.matrix[i][column].toString()}) / (${this.matrix[row][column]})`).toString()).toString();
+          console.log('factor before1 ', this.matrix[i][column].toString())
+          console.log('PARam factor1 ', `-(${this.matrix[i][column].toString()}) / (${this.matrix[row][column]})`)
+        } else {
+          factor =  Math.simplify( Math.rationalize(`-(${this.matrix[i][column].toString()}) / (${this.matrix[row][column]})`).toString()).toString();
+          console.log('factor before2 ', this.matrix[i][column].toString())
+          console.log('PARam factor2 ', `-(${this.matrix[i][column].toString()}) / (${this.matrix[row][column]})`)
+        }
+        console.log('FACTOR ', factor)
         for (let j = 0; j < this.matrix[i].length; j++) {
-          this.matrix[i][j] = Algebrite.run(Math.rationalize(`${this.matrix[i][j]} + ${this.matrix[row][j]} * (${factor})`).toString()).toString();
+          console.log(this.matrix[i][j].toString().includes('M'))
+          console.log("CUR MAT ", this.matrix[i][j])
+          if(this.matrix[i][j].toString().includes('M')) {
+            console.log(`PAram mat1 ${this.matrix[i][j].toString()} + ${this.matrix[row][j].toString()} * (${factor})`)
+            this.matrix[i][j] = Math.simplify(Math.rationalize(`${this.matrix[i][j].toString()} + ${this.matrix[row][j].toString()} * (${factor})`).toString()).toString();
+          } else {
+            console.log(`PAram mat2 ${this.matrix[i][j].toString()} + ${this.matrix[row][j].toString()} * (${factor})`)
+            console.log('ratio ', Math.rationalize(`${this.matrix[i][j].toString()} + ${this.matrix[row][j].toString()} * (${factor})`).toString())
+            this.matrix[i][j] = Math.simplify(Math.rationalize(`${this.matrix[i][j].toString()} + ${this.matrix[row][j].toString()} * (${factor})`).toString()).toString();
+          }
+          console.log("RESULT MAT ", this.matrix[i][j])
+          this.getInfo()
         }
         continue;
       } else {
