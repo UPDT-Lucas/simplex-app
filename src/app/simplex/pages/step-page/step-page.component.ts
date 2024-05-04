@@ -8,25 +8,22 @@ import SimplexBigM from '../../../scripts/simplex-big-m';
 @Component({
   selector: 'app-step-page',
   standalone: true,
-  imports: [
-    SimplexMatrixComponent,
-    HeaderComponent
-  ],
+  imports: [SimplexMatrixComponent, HeaderComponent],
   templateUrl: './step-page.component.html',
-  styleUrl: './step-page.component.css'
+  styleUrl: './step-page.component.css',
 })
 export class StepPageComponent {
   matrix: number[][] = [];
-  horizontalHeaders: string[] = []
-  verticalHeaders: string[] = []
-  type: string = "";
-  method: string = "";
+  horizontalHeaders: string[] = [];
+  verticalHeaders: string[] = [];
+  type: string = '';
+  method: string = '';
   maxIterations: number = 10;
   noSolution: boolean = false;
   solved: boolean = false;
-  solutions: string [] = []
+  solutions: string[] = [];
 
-  constructor(private solverService: SolverService) { }
+  constructor(private solverService: SolverService) {}
 
   ngOnInit() {
     this.getMatrix();
@@ -37,11 +34,11 @@ export class StepPageComponent {
   }
 
   getType() {
-    this.type = this.solverService.getType()
+    this.type = this.solverService.getType();
   }
 
   getMethod() {
-    this.method = this.solverService.getMethod()
+    this.method = this.solverService.getMethod();
   }
 
   getMatrix() {
@@ -49,50 +46,83 @@ export class StepPageComponent {
   }
 
   getHorizontalHeaders() {
-    this.horizontalHeaders = this.solverService.getHorizontalHeaders()
+    this.horizontalHeaders = this.solverService.getHorizontalHeaders();
   }
 
   getVerticalHeaders() {
-    this.verticalHeaders = this.solverService.getVerticalHeaders()
+    this.verticalHeaders = this.solverService.getVerticalHeaders();
+  }
+
+  updateMatrix() {
+    this.solverService.clearMatrix();
+    this.solverService.saveMatrix();
+
   }
 
   solve() {
-    if (this.method == "simplex") {
-      const Solver = new Simplex([... this.matrix], [... this.horizontalHeaders], [... this.verticalHeaders], this.type == "max" ? false : true)
+    if (this.method == 'simplex') {
+      const Solver = new Simplex(
+        [...this.matrix],
+        [...this.verticalHeaders],
+        [...this.horizontalHeaders],
+        this.type == 'max' ? false : true
+      );
 
-      if(this.verticalHeaders.includes("w")){
-        Solver.balanceArtificalVars()
+      if (this.verticalHeaders.includes('w')) {
+        Solver.balanceArtificalVars();
+        console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
+        console.log('BBBBBBBBBBBB ', this.verticalHeaders);
+        Solver.getInfo();
         while (!Solver.checkSolved()) {
           if (Solver.makeFaseOneIteration() == -1) {
             this.noSolution = true;
-            return
+            return;
           }
+          console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
+          console.log('BBBBBBBBBBBB ', this.verticalHeaders);
         }
-        Solver.prepareFaseTwo()
+        Solver.prepareFaseTwo();
+        console.log('After prepare fase two');
+        Solver.getInfo();
       }
 
       while (!Solver.checkSolved()) {
         if (Solver.makeFaseTwoIteration() == -1) {
           this.noSolution = true;
-          return
+          return;
         }
-        Solver.getInfo()
+        Solver.getInfo();
       }
       this.solved = true;
-      this.verticalHeaders = Solver.getCurrentVars();
-      this.solutions = Solver.getSolution()
-      console.log(this.solutions)
+      console.log('MNAAMAMAM' + this.matrix);
+      this.matrix = Solver.getMatrix();
+      console.log(this.matrix + ' AAAAA')
+      this.updateMatrix();
+      console.log('MNAAMAMAM' + this.matrix);
+      Solver.getInfo();
+      this.verticalHeaders = Solver.getBasicVars();
+      this.horizontalHeaders = Solver.getCurrentVars();
+      this.solutions = Solver.getSolution();
+      console.log(this.solutions);
     } else {
-      const Solver = new SimplexBigM([... this.matrix], [... this.horizontalHeaders], [... this.verticalHeaders], this.type == "max" ? false : true)
-      Solver.balanceArtificalVars()
+      const Solver = new SimplexBigM(
+        [...this.matrix],
+        [...this.verticalHeaders],
+        [...this.horizontalHeaders],
+        this.type == 'max' ? false : true
+      );
+      Solver.balanceArtificalVars();
+      Solver.getInfo();
       while (!Solver.checkSolved()) {
-        if(Solver.makeIteration() == -1){
+        Solver.getInfo();
+        if (Solver.makeIteration() == -1) {
           this.noSolution = true;
-          return
+          return;
         }
+        console.log(Solver.checkSolved());
       }
+      Solver.getInfo();
       this.solved = true;
     }
-
   }
 }

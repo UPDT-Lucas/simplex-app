@@ -38,6 +38,10 @@ export class SolverService {
     return this.method
   }
 
+  clearMatrix(){
+    localStorage.removeItem('matrix');
+  }
+
   clearStorage(){
     localStorage.clear();
     this.BvsHeaders = ["z"]
