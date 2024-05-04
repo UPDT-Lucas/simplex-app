@@ -4,6 +4,7 @@ import { SimplexMatrixComponent } from '../../components/simplex-matrix/simplex-
 import Simplex from '../../../scripts/simplex';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import SimplexBigM from '../../../scripts/simplex-big-m';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-step-page',
@@ -13,7 +14,7 @@ import SimplexBigM from '../../../scripts/simplex-big-m';
   styleUrl: './step-page.component.css',
 })
 export class StepPageComponent {
-  matrix: number[][] = [];
+  matrix: any[][] = [];
   horizontalHeaders: string[] = [];
   verticalHeaders: string[] = [];
   type: string = '';
@@ -23,7 +24,7 @@ export class StepPageComponent {
   solved: boolean = false;
   solutions: string[] = [];
 
-  constructor(private solverService: SolverService) {}
+  constructor(private solverService: SolverService, private router: Router) { }
 
   ngOnInit() {
     this.getMatrix();
@@ -54,56 +55,50 @@ export class StepPageComponent {
   }
 
   updateMatrix() {
-    this.solverService.clearMatrix();
+    this.solverService.clearStorage();
     this.solverService.saveMatrix();
-
   }
 
   solve() {
     if (this.method == 'simplex') {
       const Solver = new Simplex(
-        [...this.matrix],
-        [...this.verticalHeaders],
-        [...this.horizontalHeaders],
+        this.matrix,
+        this.verticalHeaders,
+        this.horizontalHeaders,
         this.type == 'max' ? false : true
       );
 
       if (this.verticalHeaders.includes('w')) {
         Solver.balanceArtificalVars();
-        console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
-        console.log('BBBBBBBBBBBB ', this.verticalHeaders);
+        // console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
+        // console.log('BBBBBBBBBBBB ', this.verticalHeaders);
         Solver.getInfo();
         while (!Solver.checkSolved()) {
           if (Solver.makeFaseOneIteration() == -1) {
             this.noSolution = true;
             return;
           }
-          console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
-          console.log('BBBBBBBBBBBB ', this.verticalHeaders);
+          // console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
+          // console.log('BBBBBBBBBBBB ', this.verticalHeaders);
         }
         Solver.prepareFaseTwo();
-        console.log('After prepare fase two');
-        Solver.getInfo();
       }
-
       while (!Solver.checkSolved()) {
         if (Solver.makeFaseTwoIteration() == -1) {
           this.noSolution = true;
           return;
         }
-        Solver.getInfo();
+        Solver.getInfo()
       }
       this.solved = true;
-      console.log('MNAAMAMAM' + this.matrix);
       this.matrix = Solver.getMatrix();
-      console.log(this.matrix + ' AAAAA')
-      this.updateMatrix();
-      console.log('MNAAMAMAM' + this.matrix);
-      Solver.getInfo();
       this.verticalHeaders = Solver.getBasicVars();
       this.horizontalHeaders = Solver.getCurrentVars();
-      this.solutions = Solver.getSolution();
-      console.log(this.solutions);
+      this.solverService.updateHeaders(this.verticalHeaders, this.horizontalHeaders)
+      this.solverService.updateSolution(Solver.getSolution())
+      this.updateMatrix();
+      Solver.getInfo();
+      this.router.navigate(['solution'])
     } else {
       const Solver = new SimplexBigM(
         [...this.matrix],
@@ -123,6 +118,14 @@ export class StepPageComponent {
       }
       Solver.getInfo();
       this.solved = true;
+      this.matrix = Solver.getMatrix();
+      this.verticalHeaders = Solver.getBasicVars();
+      this.horizontalHeaders = Solver.getCurrentVars();
+      this.solverService.updateHeaders(this.verticalHeaders, this.horizontalHeaders)
+      this.solverService.updateSolution(Solver.getSolution())
+      this.updateMatrix();
+      Solver.getInfo();
+      this.router.navigate(['solution'])
     }
   }
 }

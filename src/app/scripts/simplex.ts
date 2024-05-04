@@ -127,7 +127,6 @@ export default class Simplex {
         }
         this.multiplyRow(row, 1 / this.matrix[row][i]);
         this.gaussJordan(row, i);
-        console.log('row ' + row + 'i ' + i);
         this.basicVars[row] = this.currentVars[i];
         // this.currentVars[row] = this.basicVars[i]
       }

@@ -55,6 +55,15 @@ export default class SimplexBigM {
     }
   }
 
+  public getBasicVars() {
+    return [...this.basicVars];
+  }
+
+  public getCurrentVars() {
+    return [...this.currentVars];
+  }
+
+
   public makeIteration() {
     for (let i = 0; i < this.matrix[0].length - 1; i++) {
       let currentCoeff;

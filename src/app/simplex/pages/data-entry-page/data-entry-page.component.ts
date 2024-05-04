@@ -3,6 +3,7 @@ import { HeaderComponent } from '../../../shared/components/header/header.compon
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { SolverService } from '../../../solver.service';
 
 @Component({
   selector: 'app-data-entry-page',
@@ -23,7 +24,11 @@ export class DataEntryPageComponent {
   type: number = 0;
 
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private solverService: SolverService) {}
+
+  ngOnInit(){
+    this.solverService.reset()
+  }
 
   goToSpecification(){
     if( ((+this.varNumber) > 0) && ((+this.restNumber) > 0)){

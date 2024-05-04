@@ -8,6 +8,7 @@ export class SolverService {
 
   private matrix: any[][] = [];
   private varHeaders: string[] = [];
+  private solution: string[] = [];
   private rhs: number[] = [];
   private variablesNumber: number = 0;
   private varCounter: number = 0;
@@ -17,6 +18,20 @@ export class SolverService {
   private method: string = ""
 
   constructor() {}
+
+  reset(){
+    this.matrix = [];
+    this.varHeaders = [];
+    this.solution = [];
+    this.rhs = [];
+    this.variablesNumber = 0;
+    this.varCounter = 0;
+    this.BvsHeaders = ['z'];
+    this.minW = [];
+    this.type = ""
+    this.method = ""
+
+  }
 
   getVerticalHeaders(): string []{
     const matrixVerticalHeaders = localStorage.getItem('v-headers');
@@ -44,8 +59,23 @@ export class SolverService {
 
   clearStorage(){
     localStorage.clear();
-    this.BvsHeaders = ["z"]
-    this.varHeaders = []
+  }
+
+  getVHeaders(): string[] {
+    const matrixV = localStorage.getItem('v-headers');
+    this.BvsHeaders =  matrixV ? JSON.parse(matrixV) : [];
+    return this.BvsHeaders
+  }
+
+  getSolution(): string[] {
+    const solutionString = localStorage.getItem('solution');
+    return solutionString ? JSON.parse(solutionString) : [];
+  }
+
+  getHHeaders(): string[] {
+    const matrixH = localStorage.getItem('h-headers');
+    this.varHeaders =  matrixH ? JSON.parse(matrixH) : [];
+    return this.varHeaders
   }
 
   getMatrix(): number[][]{
@@ -130,10 +160,20 @@ export class SolverService {
     }
   }
 
+  updateHeaders(v: string[], h: string[]){
+    this.BvsHeaders = v;
+    this.varHeaders = h;
+  }
+
+  updateSolution(solution: string[]){
+    this.solution = solution
+  }
+
   saveMatrix(){
     localStorage.setItem('matrix', JSON.stringify(this.matrix))
     localStorage.setItem('v-headers', JSON.stringify(this.BvsHeaders))
     localStorage.setItem('h-headers', JSON.stringify(this.varHeaders))
+    localStorage.setItem('solution', JSON.stringify(this.solution))
   }
 
   addRhs(){

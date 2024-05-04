@@ -1,0 +1,20 @@
+<div class="container">
+  <shared-header></shared-header>
+  <div class="main-content">
+    <shared-simplex-matrix
+    [matrix]="this.matrix"
+    [verticalHeaders]="this.vHeaders"
+    [horizontalHeaders]="this.hHeaders"
+    [error]="false">
+  </shared-simplex-matrix>
+  <!-- @if (this.noSolution) {
+    <p>Solución no acotada</p>
+  }@else {
+    <div class="solutions">
+      @for (sol of solutions; track $index) {
+        <p>{{sol}}</p>
+      }
+    </div>
+  }
+  </div> -->
+</div>
