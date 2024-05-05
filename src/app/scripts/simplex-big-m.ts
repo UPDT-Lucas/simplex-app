@@ -64,7 +64,8 @@ export default class SimplexBigM {
   }
 
 
-  public makeIteration() {
+  public makeIteration(): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
     let minCoeff = Number.MAX_VALUE;
     for (let i = 0; i < this.matrix[0].length - 1; i++) {
       let actualCoeff;
@@ -87,11 +88,11 @@ export default class SimplexBigM {
             minCoeff = Number(actualCoeff);
           }
         }
-      }   
+      }
     }
     console.log("MINCOEFF ", minCoeff)
     if (minCoeff >= 0) {
-      return -1;
+      resolve(-1);
     }
     for (let i = 0; i < this.matrix[0].length - 1; i++) {
       let currentCoeff;
@@ -120,7 +121,7 @@ export default class SimplexBigM {
           }
         }
         if (row === -1) {
-          return -1;
+          resolve(-1);
         }
         this.multiplyRow(row, 1 / Number(this.matrix[row][i]));
         this.gaussJordan(row, i);
@@ -128,7 +129,8 @@ export default class SimplexBigM {
         break;
       }
     }
-    return 1
+    resolve(1) ;
+    });
   }
 
   public checkSolved() {

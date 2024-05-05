@@ -40,9 +40,20 @@ export default class Simplex {
     }
   }
 
-  public makeFaseOneIteration() {
+
+  public async makeFaseOneIteration(): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+    let minCoeff = Number.MAX_VALUE;
     for (let i = 0; i < this.matrix[0].length - 1; i++) {
-      if (this.matrix[0][i] < 0) {
+      if(this.matrix[0][i] < minCoeff){
+        minCoeff = this.matrix[0][i];
+      }
+    }
+    if (minCoeff >= 0) {
+      resolve(-1);
+    }
+    for (let i = 0; i < this.matrix[0].length - 1; i++) {
+      if (this.matrix[0][i] < 0 && this.matrix[0][i] == minCoeff) {
         let min = Number.MAX_VALUE;
         let row = -1;
         for (let j = 2; j < this.matrix.length; j++) {
@@ -57,7 +68,7 @@ export default class Simplex {
         }
         //this.currentVars[row] = this.basicVars[i];
         if (row === -1) {
-          return -1;
+          resolve(-1);
         }
         this.multiplyRow(row, 1 / this.matrix[row][i]);
         this.gaussJordan(row, i);
@@ -65,7 +76,8 @@ export default class Simplex {
         // this.currentVars[row] = this.basicVars[i]
       }
     }
-    return 1;
+    resolve(1) ;
+    });
   }
 
   public checkSolved() {
@@ -85,7 +97,6 @@ export default class Simplex {
   }
 
   public prepareFaseTwo() {
-    console.log('prepareFaseTwo');
     this.getInfo();
     this.basicVars.splice(0, 1);
     this.matrix.splice(0, 1);
@@ -106,38 +117,40 @@ export default class Simplex {
     this.getInfo();
   }
 
-  public makeFaseTwoIteration(): number {
-    let minCoeff = Number.MAX_VALUE;
-    for (let i = 0; i < this.matrix[0].length - 1; i++) {
-      if(this.matrix[0][i] < minCoeff){
-        minCoeff = this.matrix[0][i];
+  public async makeFaseTwoIteration(): Promise<number> {
+    return new Promise<number>((resolve, reject) => {
+      let minCoeff = Number.MAX_VALUE;
+      for (let i = 0; i < this.matrix[0].length - 1; i++) {
+        if (this.matrix[0][i] < minCoeff) {
+          minCoeff = this.matrix[0][i];
+        }
       }
-    }
-    for (let i = 0; i < this.matrix[0].length - 1; i++) {
-      if (this.matrix[0][i] < 0 && this.matrix[0][i] == minCoeff) {
-        let min = Number.MAX_VALUE;
-        let row = -1;
-        for (let j = 1; j < this.matrix.length; j++) {
-          if (this.matrix[j][i] > 0) {
-            let ratio =
-              this.matrix[j][this.matrix[j].length - 1] / this.matrix[j][i];
-            if (ratio < min) {
-              min = ratio;
-              row = j;
+      if (minCoeff >= 0) {
+        resolve(-1);
+      }
+      for (let i = 0; i < this.matrix[0].length - 1; i++) {
+        if (this.matrix[0][i] < 0 && this.matrix[0][i] == minCoeff) {
+          let min = Number.MAX_VALUE;
+          let row = -1;
+          for (let j = 1; j < this.matrix.length; j++) {
+            if (this.matrix[j][i] > 0) {
+              let ratio = this.matrix[j][this.matrix[j].length - 1] / this.matrix[j][i];
+              if (ratio < min) {
+                min = ratio;
+                row = j;
+              }
             }
           }
+          if (row === -1 || minCoeff >= 0) {
+            resolve(-1);
+          }
+          this.multiplyRow(row, 1 / this.matrix[row][i]);
+          this.gaussJordan(row, i);
+          this.basicVars[row] = this.currentVars[i];
         }
-        //this.currentVars[row] = this.basicVars[i];
-        if (row === -1 || minCoeff >= 0) {
-          return -1;
-        }
-        this.multiplyRow(row, 1 / this.matrix[row][i]);
-        this.gaussJordan(row, i);
-        this.basicVars[row] = this.currentVars[i];
-        // this.currentVars[row] = this.basicVars[i]
       }
-    }
-    return 1;
+      resolve(1);
+    });
   }
 
   public getMatrix() {
@@ -204,13 +217,6 @@ export default class Simplex {
     }
      arraySolution.sort((a, b) => b.localeCompare(a));
      return arraySolution;
-    // this.matrix = this.transpose(this.matrix);
-    // const rhs = this.matrix[this.matrix.length - 1];
-    // for (let i = 0; i < this.currentVars.length; i++) {
-    //   this.solutions.push(`${this.currentVars[i]} = ${rhs[i]}`);
-    // }
-    // this.matrix = this.transpose(this.matrix);
-    // return this.solutions;
   }
 
   transpose(matrix: number[][]): number[][] {

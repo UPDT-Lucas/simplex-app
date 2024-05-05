@@ -1,12 +1,18 @@
 <div class="container">
   <shared-header></shared-header>
   <div class="main-content">
-    <shared-simplex-matrix
-    [matrix]="this.matrix"
-    [verticalHeaders]="this.verticalHeaders"
-    [horizontalHeaders]="this.horizontalHeaders"
-    [error]="this.noSolution">
-  </shared-simplex-matrix>
+    @if(render){
+      @defer {
+        <shared-simplex-matrix
+        [matrix]="this.matrix"
+        [verticalHeaders]="this.verticalHeaders"
+        [horizontalHeaders]="this.horizontalHeaders"
+        [error]="false">
+      </shared-simplex-matrix>
+      } @placeholder (minimum 100ms) {
+        <p>Resolviendo...</p>
+      }
+    }
   @if (this.noSolution) {
     <p>Solución no acotada</p>
   }

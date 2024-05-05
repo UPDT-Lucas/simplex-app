@@ -23,6 +23,10 @@ export class StepPageComponent {
   noSolution: boolean = false;
   solved: boolean = false;
   solutions: string[] = [];
+  actualSolver!: Simplex | SimplexBigM;
+  isPhaseOne: boolean = true;
+  isBalanced: boolean = false;
+  render: boolean = false;
 
   constructor(private solverService: SolverService, private router: Router) { }
 
@@ -32,6 +36,7 @@ export class StepPageComponent {
     this.getVerticalHeaders();
     this.getType();
     this.getMethod();
+    this.render = true;
   }
 
   getType() {
@@ -54,78 +59,110 @@ export class StepPageComponent {
     this.verticalHeaders = this.solverService.getVerticalHeaders();
   }
 
-  updateMatrix() {
+  updateData() {
+    this.matrix = this.actualSolver.getMatrix();
     this.solverService.clearStorage();
+    this.verticalHeaders = this.actualSolver.getBasicVars();
+    this.horizontalHeaders = this.actualSolver.getCurrentVars();
+    this.solverService.updateSolution(this.actualSolver.getSolution())
+    this.solverService.updateHeaders(this.verticalHeaders, this.horizontalHeaders)
+    this.solverService.updateMatrix(this.matrix)
     this.solverService.saveMatrix();
+
   }
 
-  solve() {
+  getSolution(): string[]{
+    return this.actualSolver.getSolution();
+  }
+
+  async solve() {
+    //Simple two phases
     if (this.method == 'simplex') {
-      const Solver = new Simplex(
+
+      this.actualSolver = new Simplex(
+        this.matrix,
+        this.verticalHeaders,
+        this.horizontalHeaders,
+        this.type == 'max' ? false : true)
+
+      //Phase One
+      if (this.verticalHeaders.includes('w')) {
+        if (!this.isBalanced) {
+          this.actualSolver.balanceArtificalVars();
+        }
+        if (!this.actualSolver.checkSolved()) {
+          this.render = false;
+          const result = await this.actualSolver.makeFaseOneIteration();
+          if (result === -1) {
+            this.noSolution = true;
+          } else {
+            this.updateData();
+            setTimeout(() => {
+              this.render = true;
+            }, 0);
+          }
+        } else {
+          this.actualSolver.prepareFaseTwo();
+          this.updateData()
+          return
+        }
+        this.updateData()
+        this.isBalanced = true;
+
+      //Phase two
+      } else {
+        if(this.actualSolver.checkSolved()){
+          this.solved = true;
+          this.solutions = this.getSolution()
+        }
+
+        if(!this.solved){
+          this.render = false;
+          const result = await this.actualSolver.makeFaseTwoIteration();
+          if (result === -1) {
+            this.noSolution = true;
+          } else {
+            this.updateData();
+            setTimeout(() => {
+              this.render = true;
+              this.solutions = this.getSolution()
+            }, 0);
+          }
+        }
+      }
+
+    //Big M
+    } else {
+      this.actualSolver = new SimplexBigM(
         this.matrix,
         this.verticalHeaders,
         this.horizontalHeaders,
         this.type == 'max' ? false : true
       );
 
-      if (this.verticalHeaders.includes('w')) {
-        Solver.balanceArtificalVars();
-        // console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
-        // console.log('BBBBBBBBBBBB ', this.verticalHeaders);
-        Solver.getInfo();
-        while (!Solver.checkSolved()) {
-          if (Solver.makeFaseOneIteration() == -1) {
-            this.noSolution = true;
-            return;
-          }
-          // console.log('AAAAAAAAAAAAAAAAAA ', this.horizontalHeaders);
-          // console.log('BBBBBBBBBBBB ', this.verticalHeaders);
-        }
-        Solver.prepareFaseTwo();
+      if (this.verticalHeaders.filter(x => x.includes("a")).length > 0) {
+        console.log("entra")
+        this.actualSolver.balanceArtificalVars();
       }
-      while (!Solver.checkSolved()) {
-        if (Solver.makeFaseTwoIteration() == -1) {
+
+      if (!this.actualSolver.checkSolved()) {
+        this.render = false;
+        const result = await this.actualSolver.makeIteration();
+        if (result === -1) {
           this.noSolution = true;
-          return;
+        } else {
+          this.updateData();
+          setTimeout(() => {
+            this.render = true;
+            this.solutions = this.getSolution()
+          }, 0);
         }
-        Solver.getInfo()
+      }else{
+        this.solved = true;
       }
-      this.solved = true;
-      this.matrix = Solver.getMatrix();
-      this.verticalHeaders = Solver.getBasicVars();
-      this.horizontalHeaders = Solver.getCurrentVars();
-      this.solverService.updateHeaders(this.verticalHeaders, this.horizontalHeaders)
-      this.solverService.updateSolution(Solver.getSolution())
-      this.updateMatrix();
-      Solver.getInfo();
-      this.router.navigate(['solution'])
-    } else {
-      const Solver = new SimplexBigM(
-        [...this.matrix],
-        [...this.verticalHeaders],
-        [...this.horizontalHeaders],
-        this.type == 'max' ? false : true
-      );
-      Solver.balanceArtificalVars();
-      Solver.getInfo();
-      while (!Solver.checkSolved()) {
-        Solver.getInfo();
-        if (Solver.makeIteration() == -1) {
-          this.noSolution = true;
-          return;
-        }
-        console.log(Solver.checkSolved());
-      }
-      Solver.getInfo();
-      this.solved = true;
-      this.matrix = Solver.getMatrix();
-      this.verticalHeaders = Solver.getBasicVars();
-      this.horizontalHeaders = Solver.getCurrentVars();
-      this.solverService.updateHeaders(this.verticalHeaders, this.horizontalHeaders)
-      this.solverService.updateSolution(Solver.getSolution())
-      this.updateMatrix();
-      Solver.getInfo();
-      this.router.navigate(['solution'])
+
+      this.updateData()
+      this.actualSolver.getInfo();
     }
   }
 }

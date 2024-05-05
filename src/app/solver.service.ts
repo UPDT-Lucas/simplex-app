@@ -16,6 +16,7 @@ export class SolverService {
   private minW: number[] = [];
   private type: string = ""
   private method: string = ""
+  private isPhaseOne: boolean = true;
 
   constructor() {}
 
@@ -31,6 +32,14 @@ export class SolverService {
     this.type = ""
     this.method = ""
 
+  }
+
+  updatePhaseOne() {
+    this.isPhaseOne = false;
+  }
+
+  getPhaseOne(): boolean {
+    return this.isPhaseOne;
   }
 
   getVerticalHeaders(): string []{
@@ -167,6 +176,10 @@ export class SolverService {
 
   updateSolution(solution: string[]){
     this.solution = solution
+  }
+
+  updateMatrix(matrix: number[][]){
+    this.matrix = matrix
   }
 
   saveMatrix(){
