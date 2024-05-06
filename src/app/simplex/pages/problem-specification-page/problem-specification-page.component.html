@@ -59,7 +59,18 @@
       }
     </div>
 
-
+    <div class="libres">
+      <h1>Free Variables</h1>
+      <div class="libres-container">
+        @for (var of iterableV; track $index) {
+          <div class="free-container">
+            <input type="checkbox" id="checkbox{{$index}}" (change)="onCheckboxChange($index)">
+            <hr>
+            <p>x{{$index+1}}</p>
+          </div>
+        }
+      </div>
+    </div>
     <button
       type="text"
       (click)="solve()">
