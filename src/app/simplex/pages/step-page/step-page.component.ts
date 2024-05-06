@@ -141,7 +141,6 @@ export class StepPageComponent {
       );
 
       if (this.verticalHeaders.filter(x => x.includes("a")).length > 0) {
-        console.log("entra")
         this.actualSolver.balanceArtificalVars();
       }
 

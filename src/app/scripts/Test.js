@@ -1,39 +1,30 @@
-import SimplexBigM from './simplex-big-m';
-
-type MatrixValue = string | number;
-type Matrix = MatrixValue[][];
-let matrix: Matrix = [
-  [-5, 2, -1, 1, 0, 0, 'M', 0],
-  [1, 4, 1, -1, 1, 0, 0, 6],
-  [2, 1, 3, -3, 0, -1, 1, 2],
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var simplex_big_m_1 = require("./simplex-big-m");
+var matrix = [
+    [-5, 2, -1, 1, 0, 0, 'M', 0],
+    [1, 4, 1, -1, 1, 0, 0, 6],
+    [2, 1, 3, -3, 0, -1, 1, 2],
 ];
-
-const simplexBigM = new SimplexBigM(
-  matrix,
-  ['z', 's4', 'a6'],
-  ['x1', 'x2', 'x3p', 'x3pp', 's4', 's5', 'a6'],
-  false
-);
-
+var simplexBigM = new simplex_big_m_1.default(matrix, ['z', 's4', 'a6'], ['x1', 'x2', 'x3p', 'x3pp', 's4', 's5', 'a6'], false);
 simplexBigM.balanceArtificalVars();
 simplexBigM.getInfo();
-let i = 0;
+var i = 0;
 while (!simplexBigM.checkSolved()) {
-  console.log('Iteration: ', i++);
-  simplexBigM.getInfo();
-  // if (simplexBigM.makeIteration() == -1) {
-  //   console.log('No solution');
-  //   break;
-  // }
-  simplexBigM.makeIteration().then( (res) => {
-    console.log(res)
-  })
-  // console.log('SOLVED?: ---------------------------------------------- ' + simplexBigM.checkSolved());
-  // if(i > 3){
-  //   break
-  // }
+    console.log('Iteration: ', i++);
+    simplexBigM.getInfo();
+    // if (simplexBigM.makeIteration() == -1) {
+    //   console.log('No solution');
+    //   break;
+    // }
+    simplexBigM.makeIteration().then(function (res) {
+        console.log(res);
+    });
+    // console.log('SOLVED?: ---------------------------------------------- ' + simplexBigM.checkSolved());
+    // if(i > 3){
+    //   break
+    // }
 }
-
 simplexBigM.getInfo();
 /*
 import Simplex from './simplex';
