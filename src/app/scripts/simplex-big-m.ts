@@ -34,11 +34,13 @@ export default class SimplexBigM {
 
   public balanceArtificalVars() {
     for (let i = 0; i < this.currentVars.length; i++) {
-      if (this.currentVars[i].charAt(0) === "a") {
+      if (this.currentVars[i].includes("a")) {
+        console.log("BALANCE SUB I ", i)
         let column = i;
         let row = -1;
         for (let j = 1; j < this.matrix.length; j++) {
-          if (this.matrix[j][column] === 1) {
+          console.log("BALANCE SUB J ", j, " MATRIX ", this.matrix[j][column])
+          if (this.matrix[j][column] === 1 || this.matrix[j][column] === '1') {
             if (row === -1) {
               row = j;
             } else {
@@ -53,6 +55,8 @@ export default class SimplexBigM {
         }
       }
     }
+    console.log('after balance ++++++++++++++++++++++++++++++++++++++++++++++')
+    this.getInfo()
   }
 
   public getBasicVars() {
@@ -65,6 +69,7 @@ export default class SimplexBigM {
 
 
   public makeIteration(): Promise<number> {
+    console.log('MAKE ITERATION ------------------------------------------')
     return new Promise<number>((resolve, reject) => {
     let minCoeff = Number.MAX_VALUE;
     for (let i = 0; i < this.matrix[0].length - 1; i++) {
@@ -73,10 +78,13 @@ export default class SimplexBigM {
         console.log('BEFORE ERROR ', this.matrix[0][i].toString())
         console.log('VEFORE ERROR ', Math.simplify(this.matrix[0][i].toString()).toString())
         actualCoeff = parseFloat(Algebrite.coeff(this.matrix[0][i], 'M', 1).toString());
+        console.log('ACTUAL COEFF ALGEE', actualCoeff)
+        console.log('ACTUAL COEFF MInCOEFF', minCoeff)
         if (actualCoeff < minCoeff) {
           minCoeff = actualCoeff;
         }
       } else {
+        console.log('BEFORE ERROR2 ', this.matrix[0][i].toString())
         if(typeof this.matrix[0][i] === 'string') {
           actualCoeff = Math.evaluate(this.matrix[0][i].toString());
           if (actualCoeff < minCoeff) {
@@ -106,7 +114,9 @@ export default class SimplexBigM {
         let min = Number.MAX_VALUE;
         let row = -1;
         for (let j = 1; j < this.matrix.length; j++) {
-          if (Number(this.matrix[j][i]) > 0) {
+          console.log("NUMBER AAAAAA ", Math.evaluate(this.matrix[j][i].toString()) > 0)
+          console.log("FLOAT VALUE ", Math.evaluate(this.matrix[j][i].toString()))
+          if (parseFloat(this.matrix[j][i].toString()) > 0) {
             console.log('ratio params ', this.matrix[j][this.matrix[j].length - 1], this.matrix[j][i])
             console.log('Fixed params ', Math.evaluate(`(${this.matrix[j][this.matrix[j].length - 1]}) / (${this.matrix[j][i]})`))
             let ratio = Math.evaluate(`(${this.matrix[j][this.matrix[j].length - 1]}) / (${this.matrix[j][i]})`);
@@ -123,7 +133,8 @@ export default class SimplexBigM {
         if (row === -1) {
           resolve(-1);
         }
-        this.multiplyRow(row, 1 / Number(this.matrix[row][i]));
+        console.log("PARAM MULTIPLY ROW ", row, " MATH ", Math.evaluate(`1 / (${this.matrix[row][i].toString()})`).toString())
+        this.multiplyRow(row, Math.evaluate(`1 / (${this.matrix[row][i].toString()})`));
         this.gaussJordan(row, i);
         this.basicVars[row] = this.currentVars[i];
         break;
@@ -149,9 +160,11 @@ export default class SimplexBigM {
   }
 
   public multiplyRow(row: number, value: number | string) {
+    console.log('MULTIPLY ROW ', row, 'VALUE ', value)
     for (let i = 0; i < this.matrix[row].length; i++) {
       if (typeof this.matrix[row][i] === 'number' && typeof value === 'number') {
         this.matrix[row][i] = Number(this.matrix[row][i]) * value;
+        console.log('MULTIPLY ROW VALUE ', this.matrix[row][i])
       } else {
         this.matrix[row][i] = Math.simplify(this.matrix[row][i] + "*" + value).toString();
       }
@@ -201,26 +214,47 @@ export default class SimplexBigM {
     }
   }
 
-  public getSolution() {
+  getFreeVarSolution(row: number) {
+    let freeVarName = this.basicVars[row].replace(/p/g, '');
+    let freeVarP = 0;
+    let freeVarPP = 0;
+    for(let i = 0; i < this.basicVars.length; i++){
+        if(this.basicVars[i].startsWith(freeVarName)) {
+          if(this.basicVars[i].endsWith("pp")) {
+            freeVarPP = Math.evaluate(this.matrix[i][this.matrix[i].length - 1].toString());
+          } else {
+            freeVarP = Math.evaluate(this.matrix[i][this.matrix[i].length - 1].toString());;
+          }
+        }
+    }
+    return (freeVarP - freeVarPP)
+  }
+
+  public getSolution(): string[] {
     let solution: { [key: string]: number } = {};
     for (let i = 0; i < this.basicVars.length; i++) {
-      solution[this.basicVars[i]] = Number(this.matrix[i][this.matrix[i].length - 1]);
+      if (this.basicVars[i].endsWith("p")) {
+        if(!(this.basicVars[i].replace(/p/g, '') in solution)) {
+          solution[this.basicVars[i].replace(/p/g, '')] = this.getFreeVarSolution(i);
+        }
+      }
+      solution[this.basicVars[i]] = Math.evaluate(this.matrix[i][this.matrix[i].length - 1].toString());
     }
     for (let i = 0; i < this.currentVars.length; i++) {
-      if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
-        solution[this.currentVars[i]] = 0;
-      }
+        if (this.basicVars.indexOf(this.currentVars[i]) === -1) {
+            solution[this.currentVars[i]] = 0;
+        }
     }
     let arraySolution = [];
     for (let solutionKey in solution) {
-      if (solutionKey.indexOf("z") !== -1 && this.isMin) {
-        arraySolution.push(`${solutionKey} = ${-solution[solutionKey]}`);
-      } else {
-        arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
-      }
+        if(solutionKey.indexOf("z") !== -1 && this.isMin){
+            arraySolution.push(`${solutionKey} = ${-solution[solutionKey]}`);
+        } else {
+            arraySolution.push(`${solutionKey} = ${solution[solutionKey]}`);
+        }
     }
-    arraySolution.sort((a, b) => b.localeCompare(a));
-    return arraySolution;
+     arraySolution.sort((a, b) => b.localeCompare(a));
+     return arraySolution;
   }
 
   public getInfo() {

@@ -86,8 +86,10 @@
       const areRhs = this.rhs.some(value => value !== 0);
       const areValues = this.matrix.some(row => row.some(value => value !== 0));
       console.log(this.selectedVariables)
+      console.log(this.matrix)
+      console.log("AFTER BUILDING INITIAL MATRIX --------------------")
       if(areRhs && areValues && allObj){
-        this.solver.solveSimplex(this.matrix, this.operators, this.rhs, this.type, this.method)
+        this.solver.solveSimplex(this.matrix, this.operators, this.rhs, this.type, this.method, this.selectedVariables)
         this.router.navigate(["solve"])
       }
     }

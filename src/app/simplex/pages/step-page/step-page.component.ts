@@ -27,6 +27,7 @@ export class StepPageComponent {
   isPhaseOne: boolean = true;
   isBalanced: boolean = false;
   render: boolean = false;
+  balancedArtificials: boolean = false;
 
   constructor(private solverService: SolverService, private router: Router) { }
 
@@ -102,6 +103,10 @@ export class StepPageComponent {
             }, 0);
           }
         } else {
+          if(this.actualSolver.checkRow0NegativeRHS()){
+            this.noSolution = true;
+            return
+          }
           this.actualSolver.prepareFaseTwo();
           this.updateData()
           return
@@ -140,8 +145,10 @@ export class StepPageComponent {
         this.type == 'max' ? false : true
       );
 
-      if (this.verticalHeaders.filter(x => x.includes("a")).length > 0) {
+      if (this.verticalHeaders.filter(x => x.includes("a")).length > 0 && !this.balancedArtificials) {
+        console.log("BALANCE ARTIFICIALS AAAAAAAAAAAAAAAAAAAAAAAAA")
         this.actualSolver.balanceArtificalVars();
+        this.balancedArtificials = true;
       }
 
       if (!this.actualSolver.checkSolved()) {

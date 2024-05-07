@@ -18,8 +18,9 @@ export default class Simplex {
   }
 
   public balanceArtificalVars() {
+    console.log("balanceArtificalVars ------------------------")
     for (let i = 0; i < this.currentVars.length; i++) {
-      if (this.currentVars[i].charAt(0) === 'a') {
+      if (this.currentVars[i].includes('a')) {
         let column = i;
         let row = -1;
         for (let j = 2; j < this.matrix.length; j++) {
@@ -38,10 +39,14 @@ export default class Simplex {
         }
       }
     }
+    console.log("after balanceArtificalVars ------------------------")
+    this.getInfo();
   }
 
 
   public async makeFaseOneIteration(): Promise<number> {
+    console.log("makeFaseOneIteration ------------------------")
+    console.log(this.matrix)
     return new Promise<number>((resolve, reject) => {
     let minCoeff = Number.MAX_VALUE;
     for (let i = 0; i < this.matrix[0].length - 1; i++) {
@@ -70,6 +75,7 @@ export default class Simplex {
         if (row === -1) {
           resolve(-1);
         }
+        console.log("PIVOT ", this.matrix[row][i], " ROW ", row, " COLUMN ", i)
         this.multiplyRow(row, 1 / this.matrix[row][i]);
         this.gaussJordan(row, i);
         this.basicVars[row] = this.currentVars[i];
@@ -81,7 +87,7 @@ export default class Simplex {
   }
 
   public checkSolved() {
-    for (let i = 0; i < this.matrix[0].length - 2; i++) {
+    for (let i = 0; i < this.matrix[0].length - 1; i++) {
       if (this.matrix[0][i] < 0) {
         return false;
       }
@@ -97,23 +103,26 @@ export default class Simplex {
   }
 
   public prepareFaseTwo() {
+    console.log("prepareFaseTwo ------------------------")
     this.getInfo();
     this.basicVars.splice(0, 1);
     this.matrix.splice(0, 1);
     for (let i = 0; i < this.matrix.length; i++) {
+      let spliceCounter = 0;
       for (let j = 0; j < this.matrix[i].length; j++) {
-        console.log(this.currentVars);
-        console.log(this.basicVars);
-        console.log(this.currentVars[j] + ' ' + this.currentVars[j].charAt(0));
-        console.log('J: ' + j);
-        if (this.currentVars[j].charAt(0) == 'a') {
-          this.matrix[i].splice(j - 1, 1);
+        if (this.currentVars[j].includes('a')) {
+          this.matrix[i].splice(j - spliceCounter, 1);
+          spliceCounter++;
+          console.log("splice ", j - 1, " j ", j)
+          this.getInfo();
         }
       }
+      this.currentVars 
     }
     this.currentVars = this.currentVars.filter(
       (value) => value.charAt(0) != 'a'
     );
+    console.log("after prepareFaseTwo ------------------------")
     this.getInfo();
   }
 
@@ -194,12 +203,30 @@ export default class Simplex {
     }
   }
 
+  getFreeVarSolution(row: number) {
+    let freeVarName = this.basicVars[row].replace(/p/g, '');
+    let freeVarP = 0;
+    let freeVarPP = 0;
+    for(let i = 0; i < this.basicVars.length; i++){
+        if(this.basicVars[i].startsWith(freeVarName)) {
+          if(this.basicVars[i].endsWith("pp")) {
+            freeVarPP = this.matrix[i][this.matrix[i].length - 1];
+          } else {
+            freeVarP = this.matrix[i][this.matrix[i].length - 1];
+          }
+        }
+    }
+    return (freeVarP - freeVarPP)
+  }
+
   public getSolution(): string[] {
     let solution: { [key: string]: number } = {};
-    console.log("basic")
-    console.log(this.basicVars)
     for (let i = 0; i < this.basicVars.length; i++) {
-      console.log(this.basicVars[i])
+      if (this.basicVars[i].endsWith("p")) {
+        if(!(this.basicVars[i].replace(/p/g, '') in solution)) {
+          solution[this.basicVars[i].replace(/p/g, '')] = this.getFreeVarSolution(i);
+        }
+      }
       solution[this.basicVars[i]] = this.matrix[i][this.matrix[i].length - 1];
     }
     for (let i = 0; i < this.currentVars.length; i++) {

@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-
 export class SolverService {
-
   private matrix: any[][] = [];
   private varHeaders: string[] = [];
   private solution: string[] = [];
@@ -14,13 +12,13 @@ export class SolverService {
   private varCounter: number = 0;
   private BvsHeaders: string[] = ['z'];
   private minW: number[] = [];
-  private type: string = ""
-  private method: string = ""
+  private type: string = '';
+  private method: string = '';
   private isPhaseOne: boolean = true;
 
   constructor() {}
 
-  reset(){
+  reset() {
     this.matrix = [];
     this.varHeaders = [];
     this.solution = [];
@@ -29,9 +27,8 @@ export class SolverService {
     this.varCounter = 0;
     this.BvsHeaders = ['z'];
     this.minW = [];
-    this.type = ""
-    this.method = ""
-
+    this.type = '';
+    this.method = '';
   }
 
   updatePhaseOne() {
@@ -42,38 +39,42 @@ export class SolverService {
     return this.isPhaseOne;
   }
 
-  getVerticalHeaders(): string []{
+  getVerticalHeaders(): string[] {
     const matrixVerticalHeaders = localStorage.getItem('v-headers');
-    this.BvsHeaders = matrixVerticalHeaders ? JSON.parse(matrixVerticalHeaders) : [];
-    return this.BvsHeaders
+    this.BvsHeaders = matrixVerticalHeaders
+      ? JSON.parse(matrixVerticalHeaders)
+      : [];
+    return this.BvsHeaders;
   }
 
-  getHorizontalHeaders(): string []{
+  getHorizontalHeaders(): string[] {
     const matrixHorizontalHeaders = localStorage.getItem('h-headers');
-    this.varHeaders =  matrixHorizontalHeaders ? JSON.parse(matrixHorizontalHeaders) : [];
-    return this.varHeaders
+    this.varHeaders = matrixHorizontalHeaders
+      ? JSON.parse(matrixHorizontalHeaders)
+      : [];
+    return this.varHeaders;
   }
 
   getType(): string {
-    return this.type
+    return this.type;
   }
 
   getMethod(): string {
-    return this.method
+    return this.method;
   }
 
-  clearMatrix(){
+  clearMatrix() {
     localStorage.removeItem('matrix');
   }
 
-  clearStorage(){
+  clearStorage() {
     localStorage.clear();
   }
 
   getVHeaders(): string[] {
     const matrixV = localStorage.getItem('v-headers');
-    this.BvsHeaders =  matrixV ? JSON.parse(matrixV) : [];
-    return this.BvsHeaders
+    this.BvsHeaders = matrixV ? JSON.parse(matrixV) : [];
+    return this.BvsHeaders;
   }
 
   getSolution(): string[] {
@@ -83,169 +84,207 @@ export class SolverService {
 
   getHHeaders(): string[] {
     const matrixH = localStorage.getItem('h-headers');
-    this.varHeaders =  matrixH ? JSON.parse(matrixH) : [];
-    return this.varHeaders
+    this.varHeaders = matrixH ? JSON.parse(matrixH) : [];
+    return this.varHeaders;
   }
 
-  getMatrix(): number[][]{
+  getMatrix(): number[][] {
     const matrixString = localStorage.getItem('matrix');
-    this.matrix =  matrixString ? JSON.parse(matrixString) : [];
-    return this.matrix
+    this.matrix = matrixString ? JSON.parse(matrixString) : [];
+    return this.matrix;
   }
 
   getCurrentVariables(operators: string[]) {
     this.varCounter = this.variablesNumber + 1;
     let pending: number[] = [];
 
-    operators.forEach(
-      (op, index) => {
-        if (op === "<=") {
-          this.addSlackVariable(1, index, operators.length)
-          this.varCounter++
-        } else if (op === ">=") {
-          this.addSlackVariable(-1, index, operators.length)
-          this.varCounter++
-          if (operators.slice(index + 1).includes("<=") ||
-            operators.slice(index + 1).includes(">=") ||
-            pending.length != 0) {
-            pending.push(index + 1)
-          } else {
-            this.addArtificialVariable(index+1, operators.length)
-            this.varCounter++
-          }
-        } else if (operators.slice(index + 1).includes("<=") ||
-          operators.slice(index + 1).includes(">=") ||
-          pending.length != 0) {
-          pending.push(index + 1)
+    operators.forEach((op, index) => {
+      if (op === '<=') {
+        this.addSlackVariable(1, index, operators.length);
+        this.varCounter++;
+      } else if (op === '>=') {
+        this.addSlackVariable(-1, index, operators.length);
+        this.varCounter++;
+        if (
+          operators.slice(index + 1).includes('<=') ||
+          operators.slice(index + 1).includes('>=') ||
+          pending.length != 0
+        ) {
+          pending.push(index + 1);
         } else {
-          this.addArtificialVariable(index+1, operators.length)
-          this.varCounter++
+          this.addArtificialVariable(index + 1, operators.length);
+          this.varCounter++;
         }
+      } else if (
+        operators.slice(index + 1).includes('<=') ||
+        operators.slice(index + 1).includes('>=') ||
+        pending.length != 0
+      ) {
+        pending.push(index + 1);
+      } else {
+        this.addArtificialVariable(index + 1, operators.length);
+        this.varCounter++;
       }
-    )
+    });
     for (let i = 0; i < pending.length; i++) {
-      this.addArtificialVariable(pending[i], operators.length)
-      this.varCounter++
+      this.addArtificialVariable(pending[i], operators.length);
+      this.varCounter++;
     }
   }
 
   addColumn(newColumn: number[]) {
-    this.matrix = this.transpose(this.matrix)
-    this.matrix.push(newColumn)
-    this.matrix = this.transpose(this.matrix)
+    this.matrix = this.transpose(this.matrix);
+    this.matrix.push(newColumn);
+    this.matrix = this.transpose(this.matrix);
   }
 
   getNormalVariables(objective: number[]) {
     for (let i = 0; i < objective.length; i++) {
-      this.varHeaders.push('x' + (i + 1))
+      this.varHeaders.push('x' + (i + 1));
     }
   }
 
-  solveSimplex(matrix: number[][], operators: string[], rhs: number[], type: string, method: string) {
-    this.variablesNumber = matrix[0].length
+  addOppositeColumn(matrix: number[][], columnIndex: number): void {
+    for (let row = 0; row < matrix.length; row++) {
+      let currentValue = matrix[row][columnIndex];
+      let oppositeValue = -currentValue;
+      matrix[row].splice(columnIndex + 1, 0, oppositeValue);
+    }
+  }
+
+  addFreeVariables(matrix: number[][], selectedFreeVars: boolean[]): void {
+    let insertions = 0;
+    for (let i = 0; i < selectedFreeVars.length; i++) {
+      if (selectedFreeVars[i]) {
+        this.varHeaders[i] = 'x' + (i + 1) + 'p';
+        this.addOppositeColumn(matrix, i + insertions);
+        insertions++;
+      }
+    }
+    console.log('inside addFreeVariables ---');
+    console.log(this.varHeaders);
+    console.log(matrix);
+    for (let i = 0; i < this.varHeaders.length; i++) {
+      if (this.varHeaders[i].endsWith('p')) {
+        this.varHeaders.splice(i + 1, 0, this.varHeaders[i] + 'p');
+        this.variablesNumber++;
+        i++;
+      }
+    }
+    console.log('inside addFreeVariables2 ---');
+    console.log(this.varHeaders);
+    console.log(matrix);
+  }
+
+  solveSimplex(
+    matrix: number[][],
+    operators: string[],
+    rhs: number[],
+    type: string,
+    method: string,
+    selectedFreeVars: boolean[]
+  ) {
+    this.variablesNumber = matrix[0].length;
     this.matrix = matrix;
-    this.rhs = rhs
-    this.type = type
-    this.method = method
-    this.checkType()
-    this.getNormalVariables(matrix[0])
-    this.getCurrentVariables(operators)
-    if(this.method == "simplex"){
-      this.setMinW()
-    }else{
-      this.addM()
+    this.rhs = rhs;
+    this.type = type;
+    this.method = method;
+    this.checkType();
+    this.getNormalVariables(matrix[0]);
+    this.addFreeVariables(matrix, selectedFreeVars);
+    console.log('TESTING -----');
+    console.log(this.varHeaders);
+    console.log(this.matrix);
+    this.getCurrentVariables(operators);
+    if (this.method == 'simplex') {
+      this.setMinW();
+    } else {
+      this.addM();
     }
-    this.addRhs()
-    this.saveMatrix()
+    this.addRhs();
+    this.saveMatrix();
   }
 
-  checkType(){
-    if(this.type=="max"){
-      this.matrix[0].forEach(
-        (el, index) => {
-          this.matrix[0][index] = -this.matrix[0][index]
-        }
-      )
+  checkType() {
+    if (this.type == 'max') {
+      this.matrix[0].forEach((el, index) => {
+        this.matrix[0][index] = -this.matrix[0][index];
+      });
     }
   }
 
-  updateHeaders(v: string[], h: string[]){
+  updateHeaders(v: string[], h: string[]) {
     this.BvsHeaders = v;
     this.varHeaders = h;
   }
 
-  updateSolution(solution: string[]){
-    this.solution = solution
+  updateSolution(solution: string[]) {
+    this.solution = solution;
   }
 
-  updateMatrix(matrix: number[][]){
-    this.matrix = matrix
+  updateMatrix(matrix: number[][]) {
+    this.matrix = matrix;
   }
 
-  saveMatrix(){
-    localStorage.setItem('matrix', JSON.stringify(this.matrix))
-    localStorage.setItem('v-headers', JSON.stringify(this.BvsHeaders))
-    localStorage.setItem('h-headers', JSON.stringify(this.varHeaders))
-    localStorage.setItem('solution', JSON.stringify(this.solution))
+  saveMatrix() {
+    localStorage.setItem('matrix', JSON.stringify(this.matrix));
+    localStorage.setItem('v-headers', JSON.stringify(this.BvsHeaders));
+    localStorage.setItem('h-headers', JSON.stringify(this.varHeaders));
+    localStorage.setItem('solution', JSON.stringify(this.solution));
   }
 
-  addRhs(){
-    if(this.minW.length!=0){
-      this.rhs.reverse()
-      this.rhs.push(0)
-      this.rhs.reverse()
+  addRhs() {
+    if (this.minW.length != 0) {
+      this.rhs.reverse();
+      this.rhs.push(0);
+      this.rhs.reverse();
     }
-    this.addColumn(this.rhs)
+    this.addColumn(this.rhs);
   }
 
-  setMinW(){
-    const artificials = this.varHeaders.filter((x) => x.includes("a"))
-    if(artificials.length!=0){
-      this.minW = Array(Number(this.varHeaders.length)).fill(0)
-      artificials.forEach(
-        art => {
-          this.minW[+art.slice(1)-1] = 1
-        }
-      )
-      this.matrix.reverse()
-      this.matrix.push(this.minW)
-      this.matrix.reverse()
+  setMinW() {
+    const artificials = this.varHeaders.filter((x) => x.includes('a'));
+    if (artificials.length != 0) {
+      this.minW = Array(Number(this.varHeaders.length)).fill(0);
+      artificials.forEach((art) => {
+        this.minW[+art.slice(1) - 1] = 1;
+      });
+      this.matrix.reverse();
+      this.matrix.push(this.minW);
+      this.matrix.reverse();
 
-      this.BvsHeaders.reverse()
-      this.BvsHeaders.push("w")
-      this.BvsHeaders.reverse()
+      this.BvsHeaders.reverse();
+      this.BvsHeaders.push('w');
+      this.BvsHeaders.reverse();
     }
   }
 
-  addM(){
-    const artificials = this.varHeaders.filter((x) => x.includes("a"))
-    artificials.forEach(
-      art => {
-        this.matrix[0][+art.slice(1)-1] = "M"
-      }
-    )
+  addM() {
+    const artificials = this.varHeaders.filter((x) => x.includes('a'));
+    artificials.forEach((art) => {
+      this.matrix[0][+art.slice(1) - 1] = 'M';
+    });
   }
 
   transpose(matrix: number[][]): number[][] {
-    return matrix[0].map((_, i) => matrix.map(array => array[i]));
+    return matrix[0].map((_, i) => matrix.map((array) => array[i]));
   }
 
-  addSlackVariable(value: number, index: number, length: number){
-    this.varHeaders.push("s" + this.varCounter)
-    if(value != -1){
-      this.BvsHeaders.push("s" + this.varCounter)
+  addSlackVariable(value: number, index: number, length: number) {
+    this.varHeaders.push('s' + this.varCounter);
+    if (value != -1) {
+      this.BvsHeaders.push('s' + this.varCounter);
     }
-    let newColumn: number[] = Array(Number(length + 1)).fill(0)
-    newColumn[index + 1] = value
-    this.addColumn(newColumn)
+    let newColumn: number[] = Array(Number(length + 1)).fill(0);
+    newColumn[index + 1] = value;
+    this.addColumn(newColumn);
   }
 
-  addArtificialVariable(index: number, length: number){
-    this.varHeaders.push("a" + this.varCounter)
-    this.BvsHeaders.push("a" + this.varCounter)
-    let newColumn: number[] = Array(Number(length + 1)).fill(0)
-    newColumn[index] = 1
-    this.addColumn(newColumn)
+  addArtificialVariable(index: number, length: number) {
+    this.varHeaders.push('a' + this.varCounter);
+    this.BvsHeaders.push('a' + this.varCounter);
+    let newColumn: number[] = Array(Number(length + 1)).fill(0);
+    newColumn[index] = 1;
+    this.addColumn(newColumn);
   }
-
 }
